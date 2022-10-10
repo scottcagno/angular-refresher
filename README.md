@@ -8,8 +8,20 @@ Setup
 3) Configure apps using the syntax `ng new <pkg-name>`
 ___
 
-### Creating Hello World
-`ng new hello-world`
+### Creating our SimpleAngularApp
+First:
 
-### Serving Hello World
+`cd web`
+
+Followed by:
+
+`ng new SimpleAngularApp`
+
+### Serving It Up
+First:
+
+`cd web`
+
+Followed by:
+
 `ng serve`
