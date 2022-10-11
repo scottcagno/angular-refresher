@@ -7,9 +7,19 @@ import { Component, OnInit } from '@angular/core';
 })
 export class Page1Component implements OnInit {
 
-  constructor() { }
+  pageName = 'Page 1';
 
+  // runs when a class is created
+  constructor() {
+  }
+
+  // runs after a class is instantiated
   ngOnInit(): void {
+    setTimeout(()=> { this.pageName = 'First Page' }, 5000)
+  }
+
+  onButtonClick() {
+    alert('hello - the date today is ' + new Date());
   }
 
 }
