@@ -8,6 +8,7 @@ export class DataService {
 
   books :Array<Book>;
   bookAddedEvent = new EventEmitter<Book>();
+  bookDeletedEvent = new EventEmitter<Book>();
 
   constructor() {
     this.books = new Array<Book>;
@@ -23,6 +24,15 @@ export class DataService {
     } else {
       this.books.push(book);
       this.bookAddedEvent.emit(book);
+    }
+  }
+
+  delBook() {
+    if (this.books.length > 0) {
+      const book = this.books.pop();
+      this.bookDeletedEvent.emit(book);
+    } else {
+      this.bookDeletedEvent.error('there are no more books to remove!');
     }
   }
 }
