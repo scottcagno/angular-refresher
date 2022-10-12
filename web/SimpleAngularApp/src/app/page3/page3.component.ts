@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {DataService} from "../data.service";
 
 @Component({
   selector: 'app-page3',
@@ -7,9 +8,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class Page3Component implements OnInit {
 
-  constructor() { }
+  constructor(private dataService: DataService) {}
 
   ngOnInit(): void {
+  }
+
+  deleteLastBook() {
+    if (this.dataService.books.length > 0) {
+      this.dataService.books.pop();
+    }
   }
 
 }

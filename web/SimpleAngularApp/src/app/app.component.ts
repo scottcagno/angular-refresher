@@ -1,6 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {FooterComponent} from "./footer/footer.component";
 import {Page2Component} from "./page2/page2.component";
+import {localDB} from "./storage/local";
 
 @Component({
   selector: 'app-root',
@@ -21,8 +22,11 @@ export class AppComponent implements OnInit {
 
   currentPage!:number;
 
+  appDB !:localDB;
+
   constructor() {
     this.currentPage = 1
+    this.appDB = new localDB('my-db');
   }
 
   updateLastAccessed() {
@@ -39,4 +43,5 @@ export class AppComponent implements OnInit {
       this.page2Component.incrementHitCounter();
     }
   }
+
 }
