@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {Book} from "./model/book";
 
 @Injectable({
@@ -7,6 +7,7 @@ import {Book} from "./model/book";
 export class DataService {
 
   books :Array<Book>;
+  bookAddedEvent = new EventEmitter<Book>();
 
   constructor() {
     this.books = new Array<Book>;
@@ -14,5 +15,14 @@ export class DataService {
     const book2 = new Book('second book', 'james', 5.99);
     const book3 = new Book('third book', 'laura', 8.99);
     this.books.push(book1, book2, book3);
+  }
+
+  addBook(book :Book) {
+    if (book.author == 'james') {
+      this.bookAddedEvent.error('books by james are not allowed!');
+    } else {
+      this.books.push(book);
+      this.bookAddedEvent.emit(book);
+    }
   }
 }
