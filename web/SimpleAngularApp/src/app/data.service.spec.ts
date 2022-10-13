@@ -21,4 +21,8 @@ describe('DataService', () => {
     //fail(); // to fail a test
     expect(service.books.length).toEqual(4);
   });
+
+  it('check that the event emitter is firing an event when the book is added', ()=>{
+    spyOn(service.bookAddedEvent, 'emit');
+  });
 });
