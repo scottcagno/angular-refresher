@@ -6,14 +6,17 @@
 /out-tsc
 /bazel-out
 
+# Angular
+.angular
+
 # Node
 /node_modules
 npm-debug.log
 yarn-error.log
 
 # IDEs and editors
-!.idea/
-.project
+#.idea/
+#.project
 .classpath
 .c9/
 *.launch
