@@ -3,11 +3,13 @@ export class Room {
   id !:number;
   name !:string;
   location !:string;
-  capacities !:Array<LayoutCapacity>;
+  capacities  !:Array<LayoutCapacity>;
 
-  constructor(name ?:string, location ?:string) {
+  constructor(id ?:number, name ?:string, location ?:string) {
+    if (id) { this.id = id }
     if (name) { this.name = name }
     if (location) { this.location = location }
+    this.capacities = new Array<LayoutCapacity>();
   }
 
 }
@@ -15,6 +17,11 @@ export class Room {
 export class LayoutCapacity {
   layout !:Layout;
   capacity !:number;
+
+  constructor(layout ?: Layout, capacity ?: number) {
+    if (layout) { this.layout = layout }
+    if (capacity) { this.capacity = capacity }
+  }
 }
 
 export enum Layout {
