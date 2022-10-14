@@ -1,7 +1,10 @@
+.debug {
+  border: 1px #1976d2 dot-dash;
+}
+
 a {
   cursor: pointer;
 }
-
 
 .row-striped:nth-of-type(odd) {
   background-color: #efefef;
