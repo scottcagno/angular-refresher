@@ -1,1 +1,28 @@
-<p>user-edit works!</p>
+<div class="edit">
+  <legend>{{ user.id == null ? 'Add' : 'Edit'}}</legend>
+  <hr>
+  <div class="card card-body bg-warning mb-3" *ngIf="message">{{ message }}</div>
+
+  <form autocomplete="off" readonly="false" novalidate>
+    <div class="mb-3">
+      <label for="name" class="form-label">Name</label>
+      <input id="name" type="text" class="form-control" placeholder="Full Name"
+             [(ngModel)]="formUser.name" name="name">
+      <div id="name-help" class="form-text text-danger">Name error message placeholder</div>
+    </div>
+    <div class="mb-3" *ngIf="user.id == null">
+      <label for="password" class="form-label">Password</label>
+      <input id="password" type="password" class="form-control" placeholder="Password"
+             [(ngModel)]="password" name="password">
+      <div id="password-help" class="form-text text-danger">Password error message placeholder</div>
+    </div>
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <button type="button" class="btn btn-outline-secondary me-md-2" (click)="onCancel()">Cancel</button>
+      <button type="button" class="btn btn-outline-success me-md-2" (click)="onSubmit()">Save</button>
+    </div>
+  </form>
+
+  {{ user.id }}
+  <br>
+  {{ user.name }}
+</div>

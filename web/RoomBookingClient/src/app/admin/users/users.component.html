@@ -1,6 +1,6 @@
 <h2>Users Admin</h2>
 <div class="pb-2">
-  <button class="btn btn-sm btn-outline-success" type="button">
+  <button class="btn btn-sm btn-outline-success" type="button" (click)="addUser()">
     <i class="fa fa-plus"> </i> Add User
   </button>
 </div>
@@ -29,7 +29,8 @@
   <div class="col-4">
     <div class="card">
       <div class="card-body">
-        <app-user-detail *ngIf="selectedUser" [user]="selectedUser"></app-user-detail>
+        <app-user-detail *ngIf="action === 'view'" [user]="selectedUser"></app-user-detail>
+        <app-user-edit *ngIf="action === 'edit'|| action === 'add' " [user]="selectedUser"></app-user-edit>
       </div>
     </div>
   </div>

@@ -19,6 +19,26 @@ export class DataService {
     return of(this.users);
   }
 
+  updateUser(user :User) :Observable<User> {
+    const originalUser = this.users.find((u)=>{ return u.id === user.id });
+    // @ts-ignore
+    originalUser.name = user.name;
+    // @ts-ignore
+    return of(originalUser);
+  }
+
+  addNewUser(newUser :User, password :string) :Observable<User> {
+    let id = 0;
+    for (const user of this.users) {
+      if (user.id > id) {
+        id = user.id;
+      }
+    }
+    newUser.id = id+1;
+    this.users.push(newUser);
+    return of(newUser);
+  }
+
   constructor() {
     // initialize rooms array
     this.rooms = new Array<Room>();
