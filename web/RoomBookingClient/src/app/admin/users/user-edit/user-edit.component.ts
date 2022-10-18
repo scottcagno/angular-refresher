@@ -14,13 +14,16 @@ export class UserEditComponent implements OnInit {
   user !:User;
   formUser !:User; // just for the form
   password !:string;
+  password2 !:string;
   message !:string;
+  nameIsValid = false;
 
   constructor(private dataService :DataService, private router :Router) {
   }
 
   ngOnInit(): void {
     this.formUser = Object.assign({}, this.user);
+    this.checkIfNameIsValid();
   }
 
   onCancel() {
@@ -39,6 +42,14 @@ export class UserEditComponent implements OnInit {
       this.dataService.updateUser(this.formUser).subscribe((user)=>{
         this.router.navigate(['admin','users'], {queryParams:{id: user.id, action: 'view'}});
       });
+    }
+  }
+
+  checkIfNameIsValid() {
+    if (this.formUser.name) {
+      this.nameIsValid = this.formUser.name.trim().length > 0;
+    } else {
+      this.nameIsValid = false;
     }
   }
 
