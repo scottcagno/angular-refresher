@@ -1,0 +1,19 @@
+<div class="detail">
+  <legend>Details</legend>
+  <hr>
+<!--  <form id="" method="" action="" autocomplete="off" readonly="true" novalidate>-->
+<!--    -->
+<!--  </form>-->
+  {{ room.id }}
+  <br>
+  {{ room.name }}
+  <br>
+  {{ room.location }}
+  <br>
+  <table>
+    <tr *ngFor="let layoutCap of room.capacities">
+      <td>{{ layoutCap.layout }}</td>
+      <td>{{ layoutCap.capacity }}</td>
+    </tr>
+  </table>
+</div>

@@ -17,11 +17,12 @@
       </thead>
       <tbody>
       <tr *ngFor="let room of rooms">
-        <td>{{room.id}}</td>
-        <td>{{room.name}}</td>
-        <td>{{room.location}}</td>
+        <td>{{ room.id }}</td>
+        <td>{{ room.name }}</td>
+        <td>{{ room.location }}</td>
         <td class="text-center">
-          <button class="btn btn-sm btn-outline-warning" type="button">View Room {{room.id}}</button>
+          <button class="btn btn-sm btn-outline-warning" type="button"
+                  (click)="selectRoom(room.id)">View Room {{room.id}}</button>
         </td>
       </tr>
       </tbody>
@@ -30,7 +31,7 @@
   <div class="col-4">
     <div class="card">
       <div class="card-body">
-        details of selected room will go here
+        <app-room-detail *ngIf="selectedRoom" [room]="selectedRoom"></app-room-detail>
       </div>
     </div>
   </div>
