@@ -8,14 +8,12 @@ import {ActivatedRoute, Router} from "@angular/router";
   templateUrl: './rooms.component.html',
   styleUrls: ['./rooms.component.css']
 })
-export class RoomsComponent implements OnInit, OnDestroy {
+export class RoomsComponent implements OnInit {
 
   rooms !:Array<Room>;
   selectedRoom !:Room;
 
-  constructor(private dataService :DataService, private route :ActivatedRoute, private router :Router) {
-
-  }
+  constructor(private dataService :DataService, private route :ActivatedRoute, private router :Router) {}
 
   ngOnInit(): void {
     this.rooms = this.dataService.rooms;
@@ -33,11 +31,10 @@ export class RoomsComponent implements OnInit, OnDestroy {
     );
   }
 
-  ngOnDestroy() {
-  }
-
   selectRoom(id :number) {
-    this.router.navigate(['admin','rooms'], {queryParams:{id:id}})
+    this.router.navigate(['admin','rooms'], {
+      queryParams:{id:id}
+    })
   }
 
 }
