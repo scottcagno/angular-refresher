@@ -12,6 +12,7 @@ export class RoomsComponent implements OnInit {
 
   rooms !:Array<Room>;
   selectedRoom !:Room;
+  action !:string;
 
   constructor(private dataService :DataService, private route :ActivatedRoute, private router :Router) {}
 
@@ -30,6 +31,11 @@ export class RoomsComponent implements OnInit {
             // + symbol before a string, converts a string into a number
             return room.id === +id
           });
+          this.action = params['action'];
+        }
+        if (params['action'] == 'add') {
+          this.selectedRoom = new Room();
+          this.action = 'edit';
         }
       }
     );
@@ -37,7 +43,13 @@ export class RoomsComponent implements OnInit {
 
   selectRoom(id :number) {
     this.router.navigate(['admin','rooms'], {
-      queryParams:{id:id}
+      queryParams:{id:id, action: 'view'}
+    })
+  }
+
+  addRoom() {
+    this.router.navigate(['admin','rooms'], {
+      queryParams:{action: 'add'}
     })
   }
 

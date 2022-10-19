@@ -1,6 +1,6 @@
 <h2>Rooms Admin</h2>
 <div class="pb-2">
-  <button class="btn btn-sm btn-outline-success" type="button">
+  <button class="btn btn-sm btn-outline-success" type="button" (click)="addRoom()">
     <i class="fa fa-plus"> </i> Add Room
   </button>
 </div>
@@ -31,7 +31,8 @@
   <div class="col-4">
     <div class="card">
       <div class="card-body">
-        <app-room-detail *ngIf="selectedRoom" [room]="selectedRoom"></app-room-detail>
+        <app-room-detail *ngIf="action === 'view'" [room]="selectedRoom"></app-room-detail>
+        <app-room-edit *ngIf="action === 'edit'" [room]="selectedRoom"></app-room-edit>
       </div>
     </div>
   </div>

@@ -1,0 +1,27 @@
+<div class="edit">
+  <legend>{{ room.id == null ? 'Add' : 'Edit'}}</legend>
+  <hr>
+  <div class="card card-body bg-warning mb-3"></div>
+
+  <form autocomplete="off" readonly="false" novalidate>
+    <div class="mb-3">
+      <label for="name" class="form-label">Name</label>
+      <input id="name" type="text" class="form-control" name="name" placeholder="Name" required>
+      <div class="form-text text-danger">Name is required</div>
+    </div>
+    <div class="mb-3">
+      <label for="location" class="form-label">Location</label>
+      <input id="location" type="location" class="form-control" name="location" placeholder="Location" required>
+      <div id="location-help" class="form-text text-danger">Location is required</div>
+    </div>
+
+    <!-- more to insert here -->
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <button type="button" class="btn btn-outline-secondary me-md-2"
+              (click)="onCancel()">Cancel</button>
+      <button type="button" class="btn btn-outline-success me-md-2"
+              (click)="onSubmit()">Save</button>
+    </div>
+  </form>
+</div>
