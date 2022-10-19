@@ -11,33 +11,39 @@
              (change)="checkIfNameIsValid()"
              required #nameField="ngModel">
       <div *ngIf="nameField.invalid && nameField.touched"
-           class="form-text text-danger">Name error message placeholder</div>
+           class="form-text text-danger">Name is required</div>
       <div *ngIf="!nameIsValid && nameField.touched"
            class="form-text text-danger">Name cannot be blank</div>
     </div>
-    <div class="mb-3" *ngIf="user.id == null">
-      <label for="password" class="form-label">Password</label>
-      <input id="password" type="password" class="form-control" placeholder="Password" required
-             #passwordField="ngModel" [(ngModel)]="password" name="password">
-      <div *ngIf="passwordField.invalid && passwordField.touched"
-           id="password-help" class="form-text text-danger">Password error message placeholder</div>
-    </div>
-    <div class="mb-3" *ngIf="user.id == null">
-      <label for="password2" class="form-label">Password2</label>
-      <input id="password2" type="password2" class="form-control" placeholder="Password2"
-             required #password2Field="ngModel" [(ngModel)]="password" name="password2">
-      <div *ngIf="password2Field.invalid && password2Field.touched"
-           id="password2-help" class="form-text text-danger">Password2 error message placeholder</div>
+    <div *ngIf="user.id == null">
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input id="password" type="password" class="form-control" placeholder="Password"
+               required #passwordField="ngModel"
+               (change)="checkIfPasswordsAreValid()"
+               [(ngModel)]="password" name="password" >
+        <div [hidden]="passwordsAreValid || passwordField.pristine"
+             id="password-help" class="form-text text-danger">Password is required</div>
+      </div>
+      <div class="mb-3">
+        <label for="password2" class="form-label">Password2</label>
+        <input id="password2" type="password2" class="form-control" placeholder="Password2"
+               required #password2Field="ngModel"
+               [(ngModel)]="password2"
+               (change)="checkIfPasswordsAreValid()" name="password2">
+        <div [hidden]="passwordsMatch || password2Field.pristine"
+             id="password2-help" class="form-text text-danger">Passwords must match</div>
+      </div>
     </div>
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
       <button type="button" class="btn btn-outline-secondary me-md-2"
               (click)="onCancel()">Cancel</button>
       <button type="button" class="btn btn-outline-success me-md-2"
-              (click)="onSubmit()" [disabled]="userForm.invalid || !nameIsValid">Save</button>
+              (click)="onSubmit()"
+              [disabled]="userForm.invalid ||
+              !nameIsValid ||
+              !passwordsAreValid ||
+              !passwordsMatch">Save</button>
     </div>
   </form>
-
-  {{ user.id }}
-  <br>
-  {{ user.name }}
 </div>
