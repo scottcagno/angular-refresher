@@ -31,6 +31,7 @@ export enum Layout {
   BOARD = 'Board Meeting'
 }
 
+
 // export namespace Layout {
 //   export function value(layout: string): typeof Layout[keyof typeof Layout] {
 //     const val = Object.keys(Layout).find(key => Layout[key as keyof typeof Layout] == layout);
