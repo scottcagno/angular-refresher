@@ -22,4 +22,21 @@ export class UserDetailComponent implements OnInit {
     this.router.navigate(['admin','users'], {queryParams:{id: this.user.id, action: 'edit'}});
   }
 
+  deleteUser() {
+    this.dataService.deleteUser(this.user.id).subscribe(
+      next => {
+        this.router.navigate(['admin','users']);
+      }
+    );
+  }
+
+  resetPassword() {
+    this.dataService.resetUserPassword(this.user.id).subscribe(
+      next => {
+        console.log('password for '+ this.user.name +' has been reset');
+        this.router.navigate(['admin','users']);
+      }
+    );
+  }
+
 }

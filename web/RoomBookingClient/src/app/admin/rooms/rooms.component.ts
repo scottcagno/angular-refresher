@@ -28,6 +28,7 @@ export class RoomsComponent implements OnInit {
     );
     this.route.queryParams.subscribe(
       (params) => {
+        this.action = '';
         const id = params['id'];
         if (id) {
           // @ts-ignore

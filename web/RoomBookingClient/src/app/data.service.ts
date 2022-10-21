@@ -15,6 +15,32 @@ export class DataService {
     return of(this.rooms);
   }
 
+  addNewRoom(newRoom: Room) : Observable<Room> {
+    let id = 0;
+    for (const room of this.rooms) {
+      if (room.id > id) {
+        id = room.id;
+      }
+    }
+    newRoom.id = id+1;
+    this.rooms.push(newRoom);
+    return of(newRoom);
+  }
+
+  updateRoom(room: Room): Observable<Room> {
+    const originalRoom = this.rooms.find(r => r.id === room.id) as Room;
+    originalRoom.name = room.name;
+    originalRoom.location = room.location;
+    originalRoom.capacities = room.capacities;
+    return of(originalRoom);
+  }
+
+  deleteRoom(id: number) : Observable<any> {
+    const room = this.rooms.find(r => r.id === id) as Room;
+    this.rooms.splice(this.rooms.indexOf(room), 1);
+    return of(null);
+  }
+
   getUsers() :Observable<Array<User>> {
     return of(this.users);
   }
@@ -37,24 +63,14 @@ export class DataService {
     return of(newUser);
   }
 
-  addNewRoom(newRoom: Room) : Observable<Room> {
-    let id = 0;
-    for (const room of this.rooms) {
-      if (room.id > id) {
-        id = room.id;
-      }
-    }
-    newRoom.id = id+1;
-    this.rooms.push(newRoom);
-    return of(newRoom);
+  deleteUser(id: number) : Observable<any> {
+    const user = this.users.find(u => u.id === id) as User;
+    this.users.splice(this.users.indexOf(user), 1);
+    return of(null);
   }
 
-  updateRoom(room: Room): Observable<Room> {
-    const originalRoom = this.rooms.find(r => r.id === room.id) as Room;
-    originalRoom.name = room.name;
-    originalRoom.location = room.location;
-    originalRoom.capacities = room.capacities;
-    return of(originalRoom);
+  resetUserPassword(id: number) :Observable<any> {
+    return of(null);
   }
 
   constructor() {
