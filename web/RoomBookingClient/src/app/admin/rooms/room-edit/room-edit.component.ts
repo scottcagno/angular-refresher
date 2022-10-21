@@ -1,15 +1,17 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {Layout, LayoutCapacity, Room} from "../../../model/Room";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {DataService} from "../../../data.service";
 import {Router} from "@angular/router";
+import {FormResetService} from "../../../form-reset.service";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-room-edit',
   templateUrl: './room-edit.component.html',
   styleUrls: ['./room-edit.component.css']
 })
-export class RoomEditComponent implements OnInit {
+export class RoomEditComponent implements OnInit, OnDestroy {
 
   @Input()
   room!: Room;
@@ -19,9 +21,27 @@ export class RoomEditComponent implements OnInit {
 
   roomForm!: FormGroup;
 
-  constructor(private formBuilder: FormBuilder, private dataService: DataService, private router: Router) {}
+  roomFormReset !: Subscription;
+
+  constructor(private formBuilder: FormBuilder,
+              private dataService: DataService,
+              private router: Router,
+              private formResetService: FormResetService) {}
 
   ngOnInit(): void {
+   this.initializeForm();
+   // this is used to clear the form
+   this.roomFormReset = this.formResetService.resetRoomFormEvent.subscribe(
+     room => {
+       this.room = room;
+     this.initializeForm();
+   });
+  }
+  ngOnDestroy() {
+    this.roomFormReset.unsubscribe();
+  }
+
+  initializeForm() {
     this.roomForm = this.formBuilder.group(
       {
         roomName: [this.room.name,Validators.required],
@@ -40,7 +60,9 @@ export class RoomEditComponent implements OnInit {
     }
   }
 
-  onCancel() {}
+  onCancel() {
+    this.router.navigate(['admin','rooms'], {queryParams:{id: this.room.id, action:'view'}});
+  }
 
   onSubmit() {
     this.room.name = <string>this.roomForm.controls['roomName'].value;
@@ -70,7 +92,6 @@ export class RoomEditComponent implements OnInit {
         }
       );
     }
-    console.log(this.room);
   }
 
   toTitle(s :string) :string {
