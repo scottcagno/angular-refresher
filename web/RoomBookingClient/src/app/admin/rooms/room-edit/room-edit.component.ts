@@ -1,6 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Layout, LayoutCapacity, Room} from "../../../model/Room";
-import {FormControl, FormGroup} from "@angular/forms";
+import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {DataService} from "../../../data.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-room-edit',
@@ -15,23 +17,26 @@ export class RoomEditComponent implements OnInit {
   layouts = Object.keys(Layout);
   layoutEnum = Object(Layout);
 
-  roomForm = new FormGroup(
-    {
-      roomName : new FormControl('name'),
-      location : new FormControl('location'),
-    }
-  );
+  roomForm!: FormGroup;
 
-  constructor() {}
+  constructor(private formBuilder: FormBuilder, private dataService: DataService, private router: Router) {}
 
   ngOnInit(): void {
-    this.roomForm.patchValue({
-      roomName:this.room.name,
-      location: this.room.location,
-    });
+    this.roomForm = this.formBuilder.group(
+      {
+        roomName: [this.room.name,Validators.required],
+        location: [this.room.location,[Validators.required,Validators.minLength(2)]],
+      },
+    );
+
     for (const layout of this.layouts) {
+      const layoutCapacity = this.room.capacities.find((lc)=>{
+        // @ts-ignore
+        return lc.layout === Layout[layout]
+      });
+      const initialCapacity = layoutCapacity == null ? 0 : layoutCapacity.capacity;
       // @ts-ignore
-      this.roomForm.addControl(`layout${layout}`, new FormControl(`layout${layout}`));
+      this.roomForm.addControl(`layout${layout}`, this.formBuilder.control(initialCapacity));
     }
   }
 
@@ -48,6 +53,22 @@ export class RoomEditComponent implements OnInit {
       // @ts-ignore
       layoutCapacity.capacity = <number>this.roomForm.controls[`layout${layout}`].value;
       this.room.capacities.push(layoutCapacity);
+    }
+
+    // adding a new room
+    if (this.room.id == null) {
+      this.dataService.addNewRoom(this.room).subscribe(
+        next => {
+          this.router.navigate(['admin','rooms'], {queryParams:{action:'view', id:next.id}});
+        }
+      );
+    } else {
+      // updating an existing room
+      this.dataService.updateRoom(this.room).subscribe(
+        next =>{
+          this.router.navigate(['admin','rooms'], {queryParams:{action:'view', id:next.id}});
+        }
+      );
     }
     console.log(this.room);
   }

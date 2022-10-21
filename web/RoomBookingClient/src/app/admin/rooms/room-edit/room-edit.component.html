@@ -8,13 +8,17 @@
       <label for="name" class="form-label">Name</label>
       <input id="name" type="text" class="form-control" placeholder="Name"
              formControlName="roomName" required>
-      <div class="form-text text-danger">Name is required</div>
+      <div class="form-text text-danger"
+           *ngIf="roomForm.controls['roomName'].invalid &&
+           roomForm.controls['roomName'].touched">Room name cannot be blank</div>
     </div>
     <div class="mb-3">
       <label for="location" class="form-label">Location</label>
       <input id="location" type="text" class="form-control" placeholder="Location"
              formControlName="location" required>
-      <div id="location-help" class="form-text text-danger">Location is required</div>
+      <div class="form-text text-danger"
+           *ngIf="roomForm.controls['location'].invalid &&
+           roomForm.controls['location'].touched">Location cannot be blank</div>
     </div>
 
 <!--    <ng-template ngFor let-e [ngForOf]="layouts">-->
@@ -24,8 +28,7 @@
         <label for="layout{{ layout }}" class="form-label">{{ layoutEnum[layout] }}</label>
 
         <input id="layout{{ layout }}" type="number" class="form-control" placeholder="{{ layoutEnum[layout] }}"
-               formControlName="layout{{ layout }}" required>
-        <div id="layout{{ layout }}-help" class="form-text text-danger">{{ layoutEnum[layout] }} is required</div>
+               formControlName="layout{{ layout }}" >
       </div>
     </span>
 <!--    </ng-template>-->
@@ -34,7 +37,7 @@
       <button type="button" class="btn btn-outline-secondary me-md-2"
               (click)="onCancel()">Cancel</button>
       <button type="button" class="btn btn-outline-success me-md-2"
-              (click)="onSubmit()">Save</button>
+              (click)="onSubmit()" [disabled]="roomForm.invalid">Save</button>
     </div>
   </form>
 </div>

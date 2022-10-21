@@ -20,10 +20,8 @@ export class DataService {
   }
 
   updateUser(user :User) :Observable<User> {
-    const originalUser = this.users.find((u)=>{ return u.id === user.id });
-    // @ts-ignore
+    const originalUser = this.users.find(u => u.id === user.id ) as User;
     originalUser.name = user.name;
-    // @ts-ignore
     return of(originalUser);
   }
 
@@ -37,6 +35,26 @@ export class DataService {
     newUser.id = id+1;
     this.users.push(newUser);
     return of(newUser);
+  }
+
+  addNewRoom(newRoom: Room) : Observable<Room> {
+    let id = 0;
+    for (const room of this.rooms) {
+      if (room.id > id) {
+        id = room.id;
+      }
+    }
+    newRoom.id = id+1;
+    this.rooms.push(newRoom);
+    return of(newRoom);
+  }
+
+  updateRoom(room: Room): Observable<Room> {
+    const originalRoom = this.rooms.find(r => r.id === room.id) as Room;
+    originalRoom.name = room.name;
+    originalRoom.location = room.location;
+    originalRoom.capacities = room.capacities;
+    return of(originalRoom);
   }
 
   constructor() {
