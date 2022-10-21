@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import {Layout, LayoutCapacity, Room} from "./model/Room";
 import {User} from "./model/User";
 import {Observable, of} from "rxjs";
+import {Booking} from "./model/Booking";
+import {formatDate} from "@angular/common";
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +12,7 @@ export class DataService {
 
   private rooms !: Array<Room>;
   private users !: Array<User>;
+  private bookings !: Array<Booking>;
 
   getRooms() :Observable<Array<Room>> {
     return of(this.rooms);
@@ -73,14 +76,21 @@ export class DataService {
     return of(null);
   }
 
+  getBookings() : Observable<Array<Booking>> {
+    return of(this.bookings);
+  }
+
   constructor() {
     // initialize rooms array
     this.rooms = new Array<Room>();
     // initialize users array
     this.users = new Array<User>();
+    // initialize bookings array
+    this.bookings = new Array<Booking>();
     // populate arrays with initial values
     this.addInitialRooms();
     this.addInitialUsers();
+    this.addInitialBookings();
   }
 
   addInitialRooms() {
@@ -104,5 +114,36 @@ export class DataService {
     const user3 = new User(3, "Dick Chesterwood");
     // add users to users array
     this.users.push(user1, user2, user3);
+  }
+
+  addInitialBookings() {
+    // create a few bookings
+    const booking1 = new Booking(
+      {
+        id: 1,
+        room: this.rooms[0],
+        user: this.users[0],
+        layout: Layout.THEATER,
+        title: 'Example meeting',
+        date: formatDate(new Date(), 'medium', 'en-us'),
+        startTime: '11:30',
+        endTime: '12:30',
+        participants: 12,
+      });
+    const booking2 = new Booking(
+      {
+        id: 2,
+        room: this.rooms[1],
+        user: this.users[1],
+        layout: Layout.USHAPE,
+        title: 'Another meeting',
+        date: formatDate(new Date(), 'medium', 'en-us'),
+        startTime: '14:00',
+        endTime: '15:00',
+        participants: 5,
+      }
+    );
+    // add bookings to bookings array
+    this.bookings.push(booking1, booking2);
   }
 }
