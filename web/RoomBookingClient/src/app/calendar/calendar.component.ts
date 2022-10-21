@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {formatDate} from "@angular/common";
 
 @Component({
   selector: 'app-calendar',
@@ -9,7 +10,11 @@ export class CalendarComponent implements OnInit {
 
   constructor() { }
 
+  selectedDate = new Date();
+
   ngOnInit(): void {
+    const date = formatDate(this.selectedDate, 'medium', 'en_us');
+    console.log(date);
   }
 
 }
