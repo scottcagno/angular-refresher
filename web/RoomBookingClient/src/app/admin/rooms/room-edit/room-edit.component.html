@@ -3,19 +3,32 @@
   <hr>
   <div class="card card-body bg-warning mb-3"></div>
 
-  <form autocomplete="off" readonly="false" novalidate>
+  <form autocomplete="off" readonly="false" novalidate [formGroup]="roomForm">
     <div class="mb-3">
       <label for="name" class="form-label">Name</label>
-      <input id="name" type="text" class="form-control" name="name" placeholder="Name" required>
+      <input id="name" type="text" class="form-control" placeholder="Name"
+             formControlName="roomName" required>
       <div class="form-text text-danger">Name is required</div>
     </div>
     <div class="mb-3">
       <label for="location" class="form-label">Location</label>
-      <input id="location" type="location" class="form-control" name="location" placeholder="Location" required>
+      <input id="location" type="text" class="form-control" placeholder="Location"
+             formControlName="location" required>
       <div id="location-help" class="form-text text-danger">Location is required</div>
     </div>
 
-    <!-- more to insert here -->
+<!--    <ng-template ngFor let-e [ngForOf]="layouts">-->
+<!--      <li>{{ e }}{{ layoutKey(e) }} {{ layoutValue(e) }}</li>-->
+    <span *ngFor="let layout of layouts">
+      <div class="mb-3">
+        <label for="layout{{ layout }}" class="form-label">{{ layoutEnum[layout] }}</label>
+
+        <input id="layout{{ layout }}" type="number" class="form-control" placeholder="{{ layoutEnum[layout] }}"
+               formControlName="layout{{ layout }}" required>
+        <div id="layout{{ layout }}-help" class="form-text text-danger">{{ layoutEnum[layout] }} is required</div>
+      </div>
+    </span>
+<!--    </ng-template>-->
 
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
       <button type="button" class="btn btn-outline-secondary me-md-2"
