@@ -13,6 +13,10 @@ export class Room {
     this.capacities = new Array<LayoutCapacity>();
   }
 
+  toString() :string {
+    return `${this.name} ${this.location}`
+  }
+
 }
 
 export class LayoutCapacity {
@@ -22,6 +26,10 @@ export class LayoutCapacity {
   constructor(layout?: Layout, capacity?: number) {
     if (layout) { this.layout = layout }
     if (capacity) { this.capacity = capacity }
+  }
+
+  toString() :string {
+    return `${this.layout}`
   }
 }
 

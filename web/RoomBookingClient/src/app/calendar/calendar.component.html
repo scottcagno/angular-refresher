@@ -1,1 +1,94 @@
-<h1>Booking System!</h1>
+<h2>Booking System</h2>
+<div class="row pb-3">
+  <div class="col">
+    <span class="lead">The following meetings are taking place on: </span>
+  </div>
+  <div class="col">
+    <input type="text" class="form-control" [ngModel]="selectedDate">
+  </div>
+  <div class="col"></div>
+</div>
+
+<h3 class="mt-5" *ngIf="bookings.length === 0">
+  There are not meetings currently scheduled for this date.
+</h3>
+
+<div class="row">
+  <div class="container">
+    <div class="pb-3">
+      <button class="btn btn-outline-primary">New Booking <i class="fa fa-plus"></i></button>
+    </div>
+    <!-- start list group -->
+    <div class="list-group">
+      <div class="list-group-item" *ngFor="let booking of bookings">
+        <div class="">
+          <div class="row g-0">
+            <div class="col-3 p-1 text-center">
+              <div class="card-body">
+                <h5>{{ booking.room.name }} {{ booking.layout }}</h5>
+                <h5>{{ booking.getDateAsDate() | date:'EEE, MMM d, y' }}</h5>
+                <p class="text-muted"> Booked by {{ booking.user.name }}</p>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="card-body">
+                <h5 class="card-title pb-1">{{ booking.title }}</h5>
+                <p class="card-text">
+                  <i class="fa fa-calendar"></i> {{ booking.getDateAsDate() | date: 'EEEE'}} <br>
+                  <i class="fa fa-clock-o"></i> {{ booking.startTime }} - {{ booking.endTime }} <br>
+                  <i class="fa fa-location-arrow"></i> {{ booking.room.name }} {{ booking.layout }} <br>
+                  <i class="fa fa-users"></i> {{ booking.participants }} participants <br>
+                </p>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="card-body">
+                <div class="d-grid gap-3 d-inline-block justify-content-end">
+                  <button class="btn btn-outline-warning" type="button">Amend</button>
+                  <button class="btn btn-outline-danger" type="button">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end list group -->
+  </div>
+</div>
+
+<!--
+<div class="card mb-3">
+  <div class="row g-0">
+    <div class="col-2 p-1 text-center">
+      <div class="card-body">
+        <h3><i class="fa fa-calendar-o"></i></h3>
+        <h5>September 27th</h5>
+      </div>
+    </div>
+    <div class="col-8">
+      <div class="card-body">
+        <h5 class="card-title">Conference call with CEO</h5>
+        <p class="card-text">
+          <i class="fa fa-calendar"></i> Friday
+          <i class="fa fa-clock-o"></i> 10:00-11:30
+          <i class="fa fa-location-arrow"></i> Blue meeting room
+          <i class="fa fa-users"></i> 9 participants
+        </p>
+        <p class="card-text">
+          <small class="text-muted">Booked by Matt on 9/24/2020 9:30am</small>
+        </p>
+      </div>
+    </div>
+    <div class="col-2">
+      <div class="card-body">
+        <div class="d-grid gap-3 d-inline-block justify-content-end">
+          <button class="btn btn-outline-warning" type="button">Amend</button>
+          <button class="btn btn-outline-danger" type="button">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+-->
+

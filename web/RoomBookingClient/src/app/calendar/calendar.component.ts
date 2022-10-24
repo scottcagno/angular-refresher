@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {formatDate} from "@angular/common";
+import {Booking} from "../model/Booking";
+import {DataService} from "../data.service";
 
 @Component({
   selector: 'app-calendar',
@@ -8,12 +10,20 @@ import {formatDate} from "@angular/common";
 })
 export class CalendarComponent implements OnInit {
 
-  constructor() { }
+  bookings !: Array<Booking>;
+
+  constructor(private dataService: DataService) {
+    this.dataService.getBookings().subscribe(
+      next => {
+        this.bookings = next;
+      }
+    );
+  }
 
   selectedDate = new Date();
 
   ngOnInit(): void {
-    const date = formatDate(this.selectedDate, 'medium', 'en_us');
+    const date :string = formatDate(this.selectedDate, 'medium', 'en_us');
     console.log(date);
   }
 
