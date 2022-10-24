@@ -27,6 +27,10 @@ export class Booking {
     if (data.participants) { this.participants = data.participants }
   }
 
+  onCancel() {}
+
+  onSubmit() {}
+
   // constructor(
   //   id?:number,
   //   room?:Room,

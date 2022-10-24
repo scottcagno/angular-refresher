@@ -1,1 +1,66 @@
-<p>edit-booking works!</p>
+<div class="edit">
+  <legend>{{ booking.id == null ? 'Add' : 'Edit'}} Booking</legend>
+  <hr>
+  <form autocomplete="off" readonly="false" novalidate class="row g-3">
+
+    <div class="mb-3 col-4">
+      <label for="date" class="form-label">Date</label>
+      <input id="date" type="text" class="form-control" placeholder="Date" name="date"
+             required
+             [(ngModel)]="booking.date">
+    </div>
+    <div class="mb-3 col-4">
+      <label for="startTime" class="form-label">Start Time</label>
+      <input id="startTime" type="time" class="form-control" placeholder="Start Time"  name="startTime"
+             required
+             [(ngModel)]="booking.startTime">
+    </div>
+    <div class="mb-3 col-4">
+      <label for="endTime" class="form-label">End Time</label>
+      <input id="endTime" type="time" class="form-control" placeholder="End Time" name="endTime"
+             required
+             [(ngModel)]="booking.endTime">
+    </div>
+    <div class="mb-3 col-4">
+      <label for="room" class="form-label">Room</label>
+      <select class="form-select" id="room" [(ngModel)]="booking.room" name="room">
+        <option *ngFor="let room of rooms" [ngValue]="room">{{ room.name }}</option>
+      </select>
+    </div>
+
+    <div class="mb-3 col-4">
+      <label for="layout" class="form-label">Layout</label>
+      <select class="form-select" id="layout" [(ngModel)]="booking.layout" name="layout">
+        <option *ngFor="let layout of layouts" [ngValue]="layoutEnum[layout]">{{ layoutEnum[layout] }}</option>
+      </select>
+    </div>
+
+    <div class="mb-3 col-4">
+      <label for="participants" class="form-label">Participants</label>
+      <input id="participants" type="number" class="form-control" placeholder="Participants" name="participants"
+             required
+             [(ngModel)]="booking.participants">
+    </div>
+
+    <div class="mb-3 col-4">
+      <label for="user" class="form-label">User</label>
+      <select class="form-select" id="user" [(ngModel)]="booking.user" name="user">
+        <option *ngFor="let user of users" [ngValue]="user">{{ user.name }}</option>
+      </select>
+    </div>
+
+    <div class="mb-3 col-8">
+      <label for="title" class="form-label">Meeting Title</label>
+      <input id="title" type="text" class="form-control" placeholder="Title" name="title"
+             required
+             [(ngModel)]="booking.title">
+    </div>
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <button type="button" class="btn btn-outline-secondary me-md-2"
+              (click)="onCancel()">Cancel</button>
+      <button type="button" class="btn btn-outline-success me-md-2"
+              (click)="onSubmit()">Save</button>
+    </div>
+  </form>
+</div>
