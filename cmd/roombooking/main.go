@@ -1,16 +1,18 @@
 package main
 
 import (
-	"log"
-	"net/http"
+	"fmt"
 
-	"github.com/scottcagno/angular-refresher/pkg/roombooking"
+	"github.com/scottcagno/angular-refresher/pkg/roombooking/api"
+	"github.com/scottcagno/angular-refresher/pkg/roombooking/rooms"
 )
 
 func main() {
 
-	api := roombooking.NewRestAPI("/api", ":8080")
+	svc := api.NewService[*rooms.Room](nil)
+	fmt.Println(svc)
 
-	log.Printf("Serving up API %s, on port %s\n", api.Version(), api.Addr())
-	log.Fatal(http.ListenAndServe(api.Addr(), api))
+	// api := roombooking.NewRestAPI("/api", ":8080")
+	// log.Printf("Serving up API %s, on port %s\n", api.Version(), api.Addr())
+	// log.Fatal(http.ListenAndServe(api.Addr(), api))
 }
