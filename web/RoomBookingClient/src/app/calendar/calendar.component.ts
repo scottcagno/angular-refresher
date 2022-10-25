@@ -20,7 +20,8 @@ export class CalendarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params =>{
+    this.route.queryParams.subscribe(
+      params =>{
       this.selectedDate = params['date'];
       if (!this.selectedDate) {
         this.selectedDate = formatDate(new Date(), 'yyyy-MM-dd', 'en_us');
@@ -46,7 +47,7 @@ export class CalendarComponent implements OnInit {
   }
 
   dateChanged() {
-    this.router.navigate([''], {queryParams:{date:this.selectedDate}})
+    this.router.navigate([''], {queryParams:{date:this.selectedDate}});
   }
 
 }

@@ -4,12 +4,12 @@
     <span class="lead">The following meetings are taking place on: </span>
   </div>
   <div class="col-3 justify-content-end">
-    <input type="date" class="form-control" [ngModel]="selectedDate" name="selectedDate" (change)="dateChanged()">
+    <input type="date" class="form-control" [(ngModel)]="selectedDate" name="selectedDate" (change)="dateChanged()">
   </div>
 </div>
 
 <h3 class="mt-5" *ngIf="bookings.length === 0">
-  There are not meetings currently scheduled for this date.
+  There are no meetings currently scheduled for {{ selectedDate | date: 'EEE, MM-dd-yyyy' }}.
 </h3>
 
 <div class="row" *ngIf="bookings.length > 0">
