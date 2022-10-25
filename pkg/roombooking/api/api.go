@@ -1,11 +1,15 @@
 package api
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"path"
 	"sort"
 	"strings"
+	"unicode"
 )
 
 const version = "v1"
@@ -94,7 +98,7 @@ func (s *Service[T]) deleteAt(i int) *T {
 	}
 	var old T
 	old = (s.data)[len(s.data)-1]
-	s.data[len(s.data)-1] = nil // or the zero value of T
+	s.data[len(s.data)-1] = *new(T) // or the zero value of T
 	s.data = s.data[:len(s.data)-1]
 	return &old
 }
@@ -115,8 +119,8 @@ func (s *Service[T]) FindOne(id string) *T {
 	return t
 }
 
-func (s *Service[T]) Insert(v *T) *T {
-	s.data = append(s.data, *v)
+func (s *Service[T]) Insert(v T) T {
+	s.data = append(s.data, v)
 	s.sortData()
 	return v
 }
@@ -144,12 +148,179 @@ func (s *Service[T]) String() string {
 	return fmt.Sprintf("%T, %#v\n", s.data, s.data)
 }
 
-type RESTController[T Resource] struct {
-	service *Service[T]
+type Controller[T Resource] struct {
+	Service *Service[T]
+	mux     *http.ServeMux
+	routes  [][]string
 }
 
-func NewController[T Resource]() *Controller[T] {
-	return &Controller[T]{
-		service: NewService[T](),
+func NewController[T Resource](mux *http.ServeMux) *Controller[T] {
+	if mux == nil {
+		mux = http.NewServeMux()
 	}
+	return &Controller[T]{
+		Service: NewService[T](),
+		mux:     mux,
+		routes:  make([][]string, 0),
+	}
+}
+
+func (c *Controller[T]) addRoute(method string, path string) {
+	c.routes = append(c.routes, []string{method, path})
+}
+
+func (c *Controller[T]) Any(path string, handler http.Handler) {
+	c.mux.Handle(path, handler)
+	c.addRoute("*", path)
+}
+
+func withMethod(method string, next http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != method {
+			code := http.StatusMethodNotAllowed
+			http.Error(w, http.StatusText(code), code)
+			return
+		}
+		next.ServeHTTP(w, r)
+	}
+	return http.HandlerFunc(fn)
+}
+
+func (c *Controller[T]) Get(path string, handler http.Handler) {
+	c.mux.Handle(path, withMethod(http.MethodGet, handler))
+	c.addRoute(http.MethodGet, path)
+}
+
+func (c *Controller[T]) Post(path string, handler http.Handler) {
+	c.mux.Handle(path, withMethod(http.MethodPost, handler))
+	c.addRoute(http.MethodPost, path)
+}
+
+func (c *Controller[T]) Put(path string, handler http.Handler) {
+	c.mux.Handle(path, withMethod(http.MethodPut, handler))
+	c.addRoute(http.MethodPut, path)
+}
+
+func (c *Controller[T]) Delete(path string, handler http.Handler) {
+	c.mux.Handle(path, withMethod(http.MethodDelete, handler))
+	c.addRoute(http.MethodDelete, path)
+}
+
+func (c *Controller[T]) Patch(path string, handler http.Handler) {
+	c.mux.Handle(path, withMethod(http.MethodPatch, handler))
+	c.addRoute(http.MethodPatch, path)
+}
+
+func (c *Controller[T]) Options(path string, handler http.Handler) {
+	c.mux.Handle(path, withMethod(http.MethodOptions, handler))
+	c.addRoute(http.MethodOptions, path)
+}
+
+func trimTrailingSlash(s string, c byte) string {
+	for len(s) > 0 && s[len(s)-1] == c {
+		s = s[:len(s)-1]
+	}
+	return s
+}
+
+func (c *Controller[T]) InitCRUD(base string) {
+	// trim trailing slash
+	base = trimTrailingSlash(base, '/')
+	// get all T
+	c.Get(base, c.DefaultGetAllHandler())
+	// get specific T
+	c.Get(path.Join(base, "/"), c.DefaultGetOneHandler())
+	// add a new T
+	c.Post(base, c.DefaultAddNewHandler())
+	// update a specific T
+	c.Put(base, c.DefaultUpdateHandler())
+	// delete a T
+	c.Delete(path.Join(base, "/"), c.DefaultDeleteOneHandler())
+}
+
+func (c *Controller[T]) StatsHandler() http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		b, err := json.Marshal(c.routes)
+		if err != nil {
+			log.Printf("status handler error: %s\n", err)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		fmt.Fprintf(w, "%s", b)
+	}
+	return http.HandlerFunc(fn)
+}
+
+func (c *Controller[T]) DefaultGetAllHandler() http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		all := c.Service.FindAll()
+		b, err := json.Marshal(all)
+		if err != nil {
+			log.Printf("default get all handler: %s\n", err)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		fmt.Fprintf(w, "%s", b)
+	}
+	return http.HandlerFunc(fn)
+}
+
+func GetURLParams(r *http.Request, expect int) (string, error) {
+	str := strings.FieldsFunc(r.URL.Path, func(c rune) bool {
+		return !unicode.IsLetter(c) && !unicode.IsNumber(c)
+	})
+	if len(str) != expect {
+		return "", errors.New("expectation did not match result")
+	}
+	return str[expect-1], nil
+}
+
+func (c *Controller[T]) DefaultGetOneHandler() http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		id, err := GetURLParams(r, 3)
+		if err != nil {
+			log.Printf("default get one handler: %s\n", err)
+		}
+		one := c.Service.FindOne(id)
+		b, err := json.Marshal(one)
+		if err != nil {
+			log.Printf("default get one handler: %s\n", err)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		fmt.Fprintf(w, "%s", b)
+	}
+	return http.HandlerFunc(fn)
+}
+
+func (c *Controller[T]) DefaultAddNewHandler() http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		log.Println("running default add new handler...")
+	}
+	return http.HandlerFunc(fn)
+}
+
+func (c *Controller[T]) DefaultUpdateHandler() http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		log.Println("running default update handler...")
+	}
+	return http.HandlerFunc(fn)
+}
+
+func (c *Controller[T]) DefaultDeleteOneHandler() http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		id, err := GetURLParams(r, 3)
+		if err != nil {
+			log.Printf("default delete one handler: %s\n", err)
+		}
+		one := c.Service.Delete(id)
+		b, err := json.Marshal(one)
+		if err != nil {
+			log.Printf("default delete one handler: %s\n", err)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		fmt.Fprintf(w, "%s", b)
+	}
+	return http.HandlerFunc(fn)
 }
