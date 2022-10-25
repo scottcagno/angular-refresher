@@ -33,6 +33,14 @@
             ]
           },
           "configurations": {
+            "local": {
+              "fileReplacements": [
+                {
+                  "replace": "src/app/data.service.ts",
+                  "replaceWith": "src/app/data.service.local.ts"
+                }
+              ]
+            },
             "production": {
               "budgets": [
                 {
@@ -70,6 +78,9 @@
           "configurations": {
             "production": {
               "browserTarget": "RoomBookingClient:build:production"
+            },
+            "local": {
+              "browserTarget": "RoomBookingClient:build:local"
             },
             "development": {
               "browserTarget": "RoomBookingClient:build:development"

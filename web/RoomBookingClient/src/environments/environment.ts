@@ -2,8 +2,13 @@
 // `ng build` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
+// development = default version
+// production = production
+// local = non rest local version
+
 export const environment = {
-  production: false
+  production: false,
+  restUrl: 'http://localhost:8080',
 };
 
 /*
