@@ -37,7 +37,7 @@
               "fileReplacements": [
                 {
                   "replace": "src/app/data.service.ts",
-                  "replaceWith": "src/app/data.service.local.ts"
+                  "with": "src/app/data.service.local.ts"
                 }
               ]
             },

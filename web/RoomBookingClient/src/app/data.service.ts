@@ -96,6 +96,6 @@ export class DataService {
    * DataService constructor
    */
   constructor() {
-
+    console.log(environment.restUrl);
   }
 }
