@@ -1,65 +1,73 @@
 package rooms
 
 import (
-	"log"
+	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
-	"github.com/scottcagno/angular-refresher/pkg/roombooking/api"
+	"github.com/scottcagno/angular-refresher/pkg/web/api"
+)
+
+const (
+	roomController = "RoomHandler"
 )
 
 type Room struct {
-	ID    int
+	ID    string
 	Title string
 	Time  time.Time
 }
 
-func (r *Room) GetID() string {
-	return strconv.Itoa(r.ID)
-}
-
-func (r *Room) SetID(id string) {
-	myID, err := strconv.Atoi(id)
-	if err != nil {
-		log.Panicf("Room.SetID(): %s\n", err)
-	}
-	r.ID = myID
-}
-
 type RoomController struct {
-	*api.Controller[*Room]
-	*api.Service[*Room]
+	rooms []Room
 }
 
-func NewRoomController(mux *http.ServeMux) *RoomController {
-	rc := &RoomController{
-		Controller: api.NewController[*Room](mux),
-		Service:    api.NewService[*Room](),
+func (c *RoomController) GetAll(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "[%s] GetAll()", roomController)
+}
+
+func (c *RoomController) GetOne(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+	for _, room := range c.rooms {
+		if room.ID == id {
+			api.AsJSON(w, room)
+			return
+		}
 	}
-	rc.Controller.Service = rc.Service
-	return rc
+	fmt.Fprintf(w, "[%s] GetOne(id: %s)", roomController, id)
 }
 
-func (rc *RoomController) InitFakeData() {
+func (c *RoomController) AddOne(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "[%s] AddOne()", roomController)
+}
+
+func (c *RoomController) SetOne(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "[%s] SetOne(id: %s)", roomController, r.URL.Query().Get("id"))
+}
+
+func (c *RoomController) DelOne(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "[%s] DelOne(id: %s)", roomController, r.URL.Query().Get("id"))
+}
+
+func (c *RoomController) InitFakeData() {
 	room1 := Room{
-		ID:    1,
+		ID:    "1",
 		Title: "Room number one",
 		Time:  time.Now(),
 	}
 	room2 := Room{
-		ID:    2,
+		ID:    "2",
 		Title: "Room number two",
 		Time:  time.Now().Add(5 * time.Hour),
 	}
 	room3 := Room{
-		ID:    3,
+		ID:    "3",
 		Title: "Room number three",
 		Time:  time.Now().Add(2 * time.Hour),
 	}
-	rc.Service.Insert(&room1)
-	rc.Service.Insert(&room2)
-	rc.Service.Insert(&room3)
+	c.rooms = append(c.rooms, room1)
+	c.rooms = append(c.rooms, room2)
+	c.rooms = append(c.rooms, room3)
 }
 
 type Params = map[string]string
