@@ -14,11 +14,11 @@ type Response struct {
 }
 
 func AsJSON(w http.ResponseWriter, data any) {
+	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(data); err != nil {
 		w.WriteHeader(http.StatusExpectationFailed)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
 	return
 }

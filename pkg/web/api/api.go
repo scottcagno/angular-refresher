@@ -2,11 +2,13 @@ package api
 
 import (
 	"net/http"
+	"path/filepath"
 )
 
 type API struct {
-	base string
-	mux  *http.ServeMux
+	base     string
+	mux      *http.ServeMux
+	handlers []handler
 }
 
 func NewAPI(base string, mux *http.ServeMux) *API {
@@ -14,20 +16,23 @@ func NewAPI(base string, mux *http.ServeMux) *API {
 		mux = http.NewServeMux()
 	}
 	api := &API{
-		base: base,
-		mux:  mux,
+		base:     base,
+		mux:      mux,
+		handlers: make([]handler, 0),
 	}
 	api.mux.Handle("/", http.RedirectHandler(api.base, http.StatusSeeOther))
 	return api
 }
 
 func (api *API) Register(name string, re Resource) {
-	r := &resourceHandler{
+	h := &handler{
 		name: name,
-		path: api.base + name,
-		re:   re,
+		path: filepath.ToSlash(filepath.Join(api.base, name)),
+		reso: re,
 	}
-	api.mux.Handle(r.path, r)
+	h.reso.Init()
+	api.handlers = append(api.handlers, *h)
+	api.mux.Handle(h.path, BasicLogger(h))
 }
 
 func (api *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -39,36 +44,53 @@ func (api *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	rh.ServeHTTP(w, r)
 }
 
-type resourceHandler struct {
+type handler struct {
 	name string
 	path string
-	re   Resource
+	reso Resource
 }
 
-func (rh *resourceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	hasID := len(r.URL.Query()) > 0
+func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		if hasID {
-			rh.re.GetOne(w, r)
-			return
-		}
-		rh.re.GetAll(w, r)
-		return
+		h.reso.Get(w, r)
 	case http.MethodPost:
-		rh.re.AddOne(w, r)
-		return
+		h.reso.Add(w, r)
 	case http.MethodPut:
-		if hasID {
-			rh.re.SetOne(w, r)
-			return
-		}
+		h.reso.Set(w, r)
 	case http.MethodDelete:
-		if hasID {
-			rh.re.DelOne(w, r)
-		}
+		h.reso.Del(w, r)
+	case http.MethodOptions:
+		Options(w, r)
 	default:
-		http.NotFoundHandler().ServeHTTP(w, r)
-		return
+		NotFound(w, r)
 	}
 }
+
+// func (rh *handler) _ServeHTTP(w http.ResponseWriter, r *http.Request) {
+// 	hasID := len(r.URL.Query()) > 0
+// 	switch r.Method {
+// 	case http.MethodGet:
+// 		if hasID {
+// 			rh.reso.GetOne(w, r)
+// 			return
+// 		}
+// 		rh.reso.GetAll(w, r)
+// 		return
+// 	case http.MethodPost:
+// 		rh.reso.AddOne(w, r)
+// 		return
+// 	case http.MethodPut:
+// 		if hasID {
+// 			rh.reso.SetOne(w, r)
+// 			return
+// 		}
+// 	case http.MethodDelete:
+// 		if hasID {
+// 			rh.reso.DelOne(w, r)
+// 		}
+// 	default:
+// 		http.NotFoundHandler().ServeHTTP(w, r)
+// 		return
+// 	}
+// }

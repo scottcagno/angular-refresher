@@ -9,10 +9,9 @@ import (
 )
 
 func main() {
-	mux := http.NewServeMux()
-	api := api.NewAPI("/api/", mux)
-	rc := new(rooms.RoomController)
-	rc.InitFakeData()
-	api.Register("rooms", rc)
-	log.Fatal(http.ListenAndServe(":8080", api))
+
+	restAPI := api.NewAPI("/api/", nil)
+	restAPI.Register("rooms", new(rooms.Rooms))
+
+	log.Fatal(http.ListenAndServe(":8080", restAPI))
 }

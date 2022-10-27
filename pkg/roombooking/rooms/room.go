@@ -1,6 +1,7 @@
 package rooms
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -18,15 +19,20 @@ type Room struct {
 	Time  time.Time
 }
 
-type RoomController struct {
+type Rooms struct {
 	rooms []Room
 }
 
-func (c *RoomController) GetAll(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "[%s] GetAll()", roomController)
+func (c *Rooms) Init() {
+	c.InitFakeData()
 }
 
-func (c *RoomController) GetOne(w http.ResponseWriter, r *http.Request) {
+func (c *Rooms) Get(w http.ResponseWriter, r *http.Request) {
+	if !r.URL.Query().Has("id") {
+		api.AsJSON(w, c.rooms)
+		// fmt.Fprintf(w, "[%s] Get()", roomController)
+		return
+	}
 	id := r.URL.Query().Get("id")
 	for _, room := range c.rooms {
 		if room.ID == id {
@@ -34,22 +40,81 @@ func (c *RoomController) GetOne(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	fmt.Fprintf(w, "[%s] GetOne(id: %s)", roomController, id)
+	fmt.Fprintf(w, "[%s] Get(id: %s)", roomController, id)
 }
 
-func (c *RoomController) AddOne(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "[%s] AddOne()", roomController)
+func (c *Rooms) Add(w http.ResponseWriter, r *http.Request) {
+	var newRoom Room
+	err := json.NewDecoder(r.Body).Decode(&newRoom)
+	if err != nil {
+		api.AsJSON(w, map[string]string{"error": "error decoding json from body"})
+		return
+	}
+	c.rooms = append(c.rooms, newRoom)
+	fmt.Fprintf(w, "[%s] Add()", roomController)
 }
 
-func (c *RoomController) SetOne(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "[%s] SetOne(id: %s)", roomController, r.URL.Query().Get("id"))
+func (c *Rooms) Set(w http.ResponseWriter, r *http.Request) {
+	// get id we need to update
+	if !r.URL.Query().Has("id") {
+		api.AsJSON(w, map[string]string{"error": "id required, but not found"})
+		return
+	}
+	id := r.URL.Query().Get("id")
+	// locate room using id
+	at := -1
+	for i, room := range c.rooms {
+		if room.ID == id {
+			at = i
+			break
+		}
+	}
+	if at == -1 {
+		api.AsJSON(w, map[string]string{"error": "error matching room id not found"})
+		return
+	}
+	// get the updated room
+	var updatedRoom Room
+	err := json.NewDecoder(r.Body).Decode(&updatedRoom)
+	if err != nil {
+		api.AsJSON(w, map[string]string{"error": "error decoding json from body"})
+		return
+	}
+	// update the room
+	c.rooms[at] = updatedRoom
+	fmt.Fprintf(w, "[%s] Set(id: %s)", roomController, r.URL.Query().Get("id"))
 }
 
-func (c *RoomController) DelOne(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "[%s] DelOne(id: %s)", roomController, r.URL.Query().Get("id"))
+func (c *Rooms) Del(w http.ResponseWriter, r *http.Request) {
+	// get id we need to update
+	if !r.URL.Query().Has("id") {
+		api.AsJSON(w, map[string]string{"error": "id required, but not found"})
+		return
+	}
+	id := r.URL.Query().Get("id")
+	// locate room using id
+	at := -1
+	for i, room := range c.rooms {
+		if room.ID == id {
+			at = i
+			break
+		}
+	}
+	if at == -1 {
+		api.AsJSON(w, map[string]string{"error": "error matching room id not found"})
+		return
+	}
+	// delete the found room
+	if at < len(c.rooms)-1 {
+		copy(c.rooms[at:], c.rooms[at+1:])
+	}
+	c.rooms[len(c.rooms)-1] = Room{} // or the zero value of T
+	c.rooms = c.rooms[:len(c.rooms)-1]
+
+	fmt.Fprintf(w, "[%s] Del(id: %s)", roomController, r.URL.Query().Get("id"))
 }
 
-func (c *RoomController) InitFakeData() {
+func (c *Rooms) InitFakeData() {
 	room1 := Room{
 		ID:    "1",
 		Title: "Room number one",
