@@ -2,7 +2,6 @@ package rooms
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -19,48 +18,46 @@ type Room struct {
 	Time  time.Time
 }
 
-type Rooms struct {
+type Controller struct {
 	rooms []Room
 }
 
-func (c *Rooms) Init() {
-	c.InitFakeData()
+func (c *Controller) Inject(s api.Service) {
+	c.rooms = s.Get("RoomRepo").([]Room)
 }
 
-func (c *Rooms) Get(w http.ResponseWriter, r *http.Request) {
-	if !r.URL.Query().Has("id") {
-		api.AsJSON(w, c.rooms)
-		// fmt.Fprintf(w, "[%s] Get()", roomController)
+func (c *Controller) Get(w http.ResponseWriter, r *http.Request) {
+	id, found := api.GetParam(r, "id")
+	if !found {
+		api.WriteJSON(w, http.StatusOK, c.rooms)
 		return
 	}
-	id := r.URL.Query().Get("id")
 	for _, room := range c.rooms {
 		if room.ID == id {
-			api.AsJSON(w, room)
+			api.WriteJSON(w, http.StatusOK, room)
 			return
 		}
 	}
-	fmt.Fprintf(w, "[%s] Get(id: %s)", roomController, id)
 }
 
-func (c *Rooms) Add(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) Add(w http.ResponseWriter, r *http.Request) {
 	var newRoom Room
-	err := json.NewDecoder(r.Body).Decode(&newRoom)
+	err := api.ReadJSON(r, &newRoom)
 	if err != nil {
-		api.AsJSON(w, map[string]string{"error": "error decoding json from body"})
+		api.WriteJSON(w, http.StatusExpectationFailed, err.Error())
 		return
 	}
 	c.rooms = append(c.rooms, newRoom)
-	fmt.Fprintf(w, "[%s] Add()", roomController)
+	api.WriteJSON(w, http.StatusCreated, c.rooms)
 }
 
-func (c *Rooms) Set(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) Set(w http.ResponseWriter, r *http.Request) {
 	// get id we need to update
-	if !r.URL.Query().Has("id") {
-		api.AsJSON(w, map[string]string{"error": "id required, but not found"})
+	id, found := api.GetParam(r, "id")
+	if !found {
+		api.WriteJSON(w, http.StatusNotFound, "error: id required, but not found")
 		return
 	}
-	id := r.URL.Query().Get("id")
 	// locate room using id
 	at := -1
 	for i, room := range c.rooms {
@@ -70,28 +67,28 @@ func (c *Rooms) Set(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if at == -1 {
-		api.AsJSON(w, map[string]string{"error": "error matching room id not found"})
+		api.WriteJSON(w, http.StatusNotFound, "error: matching room id not found")
 		return
 	}
 	// get the updated room
 	var updatedRoom Room
 	err := json.NewDecoder(r.Body).Decode(&updatedRoom)
 	if err != nil {
-		api.AsJSON(w, map[string]string{"error": "error decoding json from body"})
+		api.WriteJSON(w, http.StatusInternalServerError, "error: decoding json from body")
 		return
 	}
 	// update the room
 	c.rooms[at] = updatedRoom
-	fmt.Fprintf(w, "[%s] Set(id: %s)", roomController, r.URL.Query().Get("id"))
+	api.WriteJSON(w, http.StatusOK, c.rooms)
 }
 
-func (c *Rooms) Del(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) Del(w http.ResponseWriter, r *http.Request) {
 	// get id we need to update
-	if !r.URL.Query().Has("id") {
-		api.AsJSON(w, map[string]string{"error": "id required, but not found"})
+	id, found := api.GetParam(r, "id")
+	if !found {
+		api.WriteJSON(w, http.StatusNotFound, "error: id required, but not found")
 		return
 	}
-	id := r.URL.Query().Get("id")
 	// locate room using id
 	at := -1
 	for i, room := range c.rooms {
@@ -101,7 +98,7 @@ func (c *Rooms) Del(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if at == -1 {
-		api.AsJSON(w, map[string]string{"error": "error matching room id not found"})
+		api.WriteJSON(w, http.StatusNotFound, "error: matching room id not found")
 		return
 	}
 	// delete the found room
@@ -110,61 +107,6 @@ func (c *Rooms) Del(w http.ResponseWriter, r *http.Request) {
 	}
 	c.rooms[len(c.rooms)-1] = Room{} // or the zero value of T
 	c.rooms = c.rooms[:len(c.rooms)-1]
-
-	fmt.Fprintf(w, "[%s] Del(id: %s)", roomController, r.URL.Query().Get("id"))
-}
-
-func (c *Rooms) InitFakeData() {
-	room1 := Room{
-		ID:    "1",
-		Title: "Room number one",
-		Time:  time.Now(),
-	}
-	room2 := Room{
-		ID:    "2",
-		Title: "Room number two",
-		Time:  time.Now().Add(5 * time.Hour),
-	}
-	room3 := Room{
-		ID:    "3",
-		Title: "Room number three",
-		Time:  time.Now().Add(2 * time.Hour),
-	}
-	c.rooms = append(c.rooms, room1)
-	c.rooms = append(c.rooms, room2)
-	c.rooms = append(c.rooms, room3)
-}
-
-type Params = map[string]string
-
-func Route(method string, path string, r *http.Request, params ...string) bool {
-	if len(params) > 0 {
-		for _, param := range params {
-			if !r.URL.Query().Has(param) {
-				return false
-			}
-		}
-	}
-	return r.Method == method && r.URL.Path == path
-}
-
-func RestRoomsController() http.Handler {
-	fn := func(w http.ResponseWriter, r *http.Request) {
-		if Route(http.MethodGet, "/api/rooms", r) {
-			// handle
-		}
-		if Route(http.MethodGet, "/api/rooms", r, "id") {
-			// handle
-		}
-		if Route(http.MethodGet, "/api/rooms", r) {
-			// handle
-		}
-		if Route(http.MethodGet, "/api/rooms", r) {
-			// handle
-		}
-		if Route(http.MethodGet, "/api/rooms", r) {
-			// handle
-		}
-	}
-	return http.HandlerFunc(fn)
+	// return some response
+	api.WriteJSON(w, http.StatusOK, c.rooms)
 }

@@ -4,13 +4,16 @@ import (
 	"net/http"
 )
 
+type Service interface {
+	InitService()
+	Get(key string) any
+}
+
 // Resource is here to represent a rest resource. It can be used to
 // represent a single item or a collection of items and is purposely
 // created to easily cater to many situations.
 type Resource interface {
-	// Init is will automatically be called when the Resource is
-	// registered by an API server
-	Init()
+	Inject(s Service)
 	// Get implements http.Handler and is responsible for locating
 	// and returns all the implementing resource items, or one if a
 	// matching identifier is found. Note: the user implementing this

@@ -1,0 +1,35 @@
+// Get all of the rooms
+GET http://localhost:8080/api/rooms
+Accept: application/json
+
+###
+
+// Get a single room
+GET http://localhost:8080/api/rooms?id=2
+Accept: application/json
+
+###
+
+// Add a new room
+POST http://localhost:8080/api/rooms
+Content-Type: application/json
+
+{
+  "ID": "4",
+  "Title": "Room number four",
+  "Time": "2022-10-27T18:15:47.5319409-04:00"
+}
+
+###
+
+// Update a room
+POST http://localhost:8080/api/rooms?id=4
+Content-Type: application/json
+
+{
+  "ID": "4",
+  "Title": "The title for room number FOUR has changed",
+  "Time": "2022-10-27T18:15:47.5319409-04:00"
+}
+
+###
