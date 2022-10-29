@@ -1,12 +1,30 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 )
 
+var (
+	// repository errors
+	ErrNone         = errors.New("there is nothing to return")
+	ErrNoMatchFound = errors.New("nothing matched the provided key")
+	ErrBadType      = errors.New("type provided was incorrect")
+)
+
+type Repository interface {
+	Init()
+	FindAll() (any, error)
+	FindOne(key string) (any, error)
+	Insert(v any) error
+	Update(key string, v any) error
+	Delete(key string) error
+	Size() int
+}
+
 type Service interface {
 	InitService()
-	Get(key string) any
+	GetRepository(key string) any
 }
 
 // Resource is here to represent a rest resource. It can be used to
