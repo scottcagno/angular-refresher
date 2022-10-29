@@ -13,14 +13,18 @@ import (
 
 func main() {
 
-	// initialize global data service
+	// initialize global data service (contains ref to all repositories)
 	ds := services.NewDataService()
 
-	// initialize controllers
+	// initialize rooms controller (and inject the data service into it)
 	roomCont := new(rooms.Controller)
 	roomCont.Inject(ds)
+
+	// initialize users controller (and inject the data service into it)
 	userCont := new(users.Controller)
 	userCont.Inject(ds)
+
+	// initialize booking controller (and inject the data service into it)
 	bookingCont := new(booking.Controller)
 	bookingCont.Inject(ds)
 
