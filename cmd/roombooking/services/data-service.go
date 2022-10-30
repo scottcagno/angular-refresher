@@ -3,14 +3,16 @@ package services
 import (
 	"sync"
 
-	"github.com/scottcagno/angular-refresher/pkg/roombooking/booking"
-	"github.com/scottcagno/angular-refresher/pkg/roombooking/rooms"
-	"github.com/scottcagno/angular-refresher/pkg/roombooking/users"
+	"github.com/scottcagno/angular-refresher/cmd/roombooking/internal/booking"
+	"github.com/scottcagno/angular-refresher/cmd/roombooking/internal/booking/rooms"
+	"github.com/scottcagno/angular-refresher/cmd/roombooking/internal/booking/users"
+	"github.com/scottcagno/angular-refresher/pkg/web/api"
 )
 
 var once sync.Once
 
 type DataService struct {
+	repos       map[string]api.Repository
 	RoomRepo    rooms.RoomRepository
 	UserRepo    users.UserRepository
 	BookingRepo booking.BookingRepository
@@ -49,15 +51,14 @@ func (ds *DataService) InitService() {
 	ds.BookingRepo.Init()
 }
 
-func (ds *DataService) GetRepository(key string) any {
-	if key == "RoomRepo" {
-		return ds.RoomRepo
+func (ds *DataService) GetRepository(key string) api.Repository {
+	repo, found := ds.repos[key]
+	if !found {
+		return nil
 	}
-	if key == "UserRepo" {
-		return ds.UserRepo
-	}
-	if key == "BookingRepo" {
-		return ds.BookingRepo
-	}
-	return nil
+	return repo
+}
+
+func (ds *DataService) AddRepository(key string, val api.Repository) {
+	ds.repos[key] = val
 }

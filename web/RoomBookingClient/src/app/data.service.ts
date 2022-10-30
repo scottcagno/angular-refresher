@@ -30,9 +30,8 @@ export class DataService {
     return of(null);
   }
 
-  deleteRoom(id: number) : Observable<any> {
-    // @ts-ignore
-    return of(null);
+  deleteRoom(id: number) : Observable<Array<User>> {
+    return this.http.get<Array<User>>(User.endpoint())
   }
 
 
@@ -101,11 +100,11 @@ export class DataService {
   }
 
   getUser(id: number) :Observable<User> {
-    return this.http.get<User>(environment.restUrl + `/api/users?id=${id}`)
+    return this.http.get<User>(User.endpoint(id))
       .pipe(
-        map(data =>{
-          return User.fromHttp(data);
-        })
+        map(data =>{ return User.fromHttp(data) })
       );
   }
+
+
 }

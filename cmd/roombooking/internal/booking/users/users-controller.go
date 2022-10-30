@@ -1,4 +1,4 @@
-package rooms
+package users
 
 import (
 	"net/http"
@@ -7,48 +7,48 @@ import (
 )
 
 type Controller struct {
-	repo RoomRepository
+	repo api.Repository
 }
 
 func (c *Controller) Inject(s api.Service) {
-	c.repo = s.GetRepository("RoomRepo").(RoomRepository)
+	c.repo = s.GetRepository("UserRepo")
 }
 
 func (c *Controller) Get(w http.ResponseWriter, r *http.Request) {
 	id, found := api.GetParam(r, "id")
 	if !found {
 		// handle, get all
-		rooms, err := c.repo.FindAll()
+		users, err := c.repo.FindAll()
 		if err != nil {
 			api.WriteJSON(w, http.StatusExpectationFailed, err)
 			return
 		}
-		api.WriteJSON(w, http.StatusOK, rooms)
+		api.WriteJSON(w, http.StatusOK, users)
 		return
 	}
 	// handle get one
-	room, err := c.repo.FindOne(id)
+	user, err := c.repo.FindOne(id)
 	if err != nil {
 		api.WriteJSON(w, http.StatusExpectationFailed, err)
 		return
 	}
-	api.WriteJSON(w, http.StatusOK, room)
+	api.WriteJSON(w, http.StatusOK, user)
 	return
 }
 
 func (c *Controller) Add(w http.ResponseWriter, r *http.Request) {
-	var newRoom Room
-	err := api.ReadJSON(r, &newRoom)
+	var newUser User
+	err := api.ReadJSON(r, &newUser)
 	if err != nil {
 		api.WriteJSON(w, http.StatusExpectationFailed, err)
 		return
 	}
-	err = c.repo.Insert(newRoom)
+	err = c.repo.Insert(newUser)
 	if err != nil {
 		api.WriteJSON(w, http.StatusExpectationFailed, err)
 		return
 	}
-	api.WriteJSON(w, http.StatusCreated, newRoom)
+	api.WriteJSON(w, http.StatusCreated, newUser)
 }
 
 func (c *Controller) Set(w http.ResponseWriter, r *http.Request) {
@@ -59,18 +59,18 @@ func (c *Controller) Set(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// get the updated room
-	var updatedRoom Room
-	err := api.ReadJSON(r, &updatedRoom)
+	var updateUser User
+	err := api.ReadJSON(r, &updateUser)
 	if err != nil {
 		api.WriteJSON(w, http.StatusExpectationFailed, err)
 		return
 	}
-	err = c.repo.Update(id, updatedRoom)
+	err = c.repo.Update(id, updateUser)
 	if err != nil {
 		api.WriteJSON(w, http.StatusExpectationFailed, err)
 		return
 	}
-	api.WriteJSON(w, http.StatusOK, updatedRoom)
+	api.WriteJSON(w, http.StatusOK, updateUser)
 }
 
 func (c *Controller) Del(w http.ResponseWriter, r *http.Request) {

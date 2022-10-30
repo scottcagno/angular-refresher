@@ -3,6 +3,8 @@ package booking
 import (
 	"time"
 
+	"github.com/scottcagno/angular-refresher/cmd/roombooking/internal/booking/rooms"
+	"github.com/scottcagno/angular-refresher/cmd/roombooking/internal/booking/users"
 	"github.com/scottcagno/angular-refresher/pkg/web/api"
 )
 
@@ -86,12 +88,12 @@ func (r *BookingRepository) Size() int {
 	return len(r.items)
 }
 
-func (r *BookingRepository) Init() {
+func (r *BookingRepository) Init(data map[string]any) {
 	booking1 := Booking{
 		ID:           "1",
 		Title:        "Conference call with CEO",
-		User:         "2",
-		Room:         "1",
+		User:         data["user2"].(users.User),
+		Room:         data["room1"].(rooms.Room),
 		Date:         time.Now().String(),
 		StartTime:    time.Now().Add(30 * time.Minute),
 		EndTime:      time.Now().Add(3 * time.Hour),
@@ -100,8 +102,8 @@ func (r *BookingRepository) Init() {
 	booking2 := Booking{
 		ID:           "2",
 		Title:        "Some important meeting",
-		User:         "1",
-		Room:         "2",
+		User:         data["user1"].(users.User),
+		Room:         data["room2"].(rooms.Room),
 		Date:         time.Now().Add(29 * time.Hour).String(),
 		StartTime:    time.Now().Add(30 * time.Hour),
 		EndTime:      time.Now().Add(31 * time.Hour),
@@ -109,4 +111,8 @@ func (r *BookingRepository) Init() {
 	}
 	r.items = append(r.items, booking1)
 	r.items = append(r.items, booking2)
+}
+
+func (r *BookingRepository) GetRepositorySet() any {
+	return r.items
 }

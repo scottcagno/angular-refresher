@@ -86,7 +86,7 @@ func (r *RoomRepository) Size() int {
 	return len(r.items)
 }
 
-func (r *RoomRepository) Init() {
+func (r *RoomRepository) Init(data map[string]any) {
 	// add initial data to room repo
 	room1 := Room{
 		ID:    "1",
@@ -106,4 +106,8 @@ func (r *RoomRepository) Init() {
 	r.items = append(r.items, room1)
 	r.items = append(r.items, room2)
 	r.items = append(r.items, room3)
+}
+
+func (r *RoomRepository) GetRepositorySet() any {
+	return r.items
 }

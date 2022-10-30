@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/scottcagno/angular-refresher/pkg/roombooking/booking"
-	"github.com/scottcagno/angular-refresher/pkg/roombooking/rooms"
-	"github.com/scottcagno/angular-refresher/pkg/roombooking/services"
-	"github.com/scottcagno/angular-refresher/pkg/roombooking/users"
+	"github.com/scottcagno/angular-refresher/cmd/roombooking/internal/booking"
+	"github.com/scottcagno/angular-refresher/cmd/roombooking/internal/booking/rooms"
+	"github.com/scottcagno/angular-refresher/cmd/roombooking/internal/booking/users"
+	"github.com/scottcagno/angular-refresher/cmd/roombooking/services"
 	"github.com/scottcagno/angular-refresher/pkg/web/api"
 )
 

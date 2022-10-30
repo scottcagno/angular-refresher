@@ -1,3 +1,7 @@
+import {environment} from "../../environments/environment";
+
+
+
 export class User {
   id !:number;
   name !:string;
@@ -13,5 +17,12 @@ export class User {
 
   static fromHttp(u: User) :User {
     return new User(u.id, u.name);
+  }
+
+  static endpoint(id ?:number):string {
+    if (id) {
+      return environment.restUrl + `/api/users?id=${id}`
+    }
+    return environment.restUrl + `/api/users`
   }
 }

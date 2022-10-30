@@ -13,25 +13,36 @@ var (
 )
 
 type Repository interface {
-	Init()
 	FindAll() (any, error)
-	FindOne(key string) (any, error)
+	FindOne(id string) (any, error)
 	Insert(v any) error
-	Update(key string, v any) error
-	Delete(key string) error
+	Update(id string, t any) error
+	Delete(id string) error
 	Size() int
+	GetRepositorySet() any
+	Init(data map[string]any)
 }
+
+//
+// type Repository[T any] interface {
+// 	FindAll() (T, error)
+// 	FindOne(id string) (T, error)
+// 	Insert(v any) error
+// 	Update(id string, t T) error
+// 	Delete(id string) error
+// 	Size() int
+// }
 
 type Service interface {
 	InitService()
-	GetRepository(key string) any
+	AddRepository(key string, val Repository)
+	GetRepository(key string) Repository
 }
 
 // Resource is here to represent a rest resource. It can be used to
 // represent a single item or a collection of items and is purposely
 // created to easily cater to many situations.
 type Resource interface {
-	Inject(s Service)
 	// Get implements http.Handler and is responsible for locating
 	// and returns all the implementing resource items, or one if a
 	// matching identifier is found. Note: the user implementing this

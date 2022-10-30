@@ -84,7 +84,7 @@ func (r *UserRepository) Size() int {
 	return len(r.items)
 }
 
-func (r *UserRepository) Init() {
+func (r *UserRepository) Init(data map[string]any) {
 	user1 := User{
 		ID:   "1",
 		Name: "Dick Chesterwood",
@@ -95,4 +95,8 @@ func (r *UserRepository) Init() {
 	}
 	r.items = append(r.items, user1)
 	r.items = append(r.items, user2)
+}
+
+func (r *UserRepository) GetRepositorySet() any {
+	return r.items
 }
