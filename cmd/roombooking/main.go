@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/scottcagno/angular-refresher/pkg/roombooking/booking"
 	"github.com/scottcagno/angular-refresher/pkg/roombooking/rooms"
@@ -28,8 +29,18 @@ func main() {
 	bookingCont := new(booking.Controller)
 	bookingCont.Inject(ds)
 
+	// initialize our cors handler
+	cors := api.CORSHandler(&api.CORSConfig{
+		AllowOrigins:     "http://localhost:4200/api/**",
+		AllowMethods:     "GET,POST,PUT,DELETE",
+		AllowHeaders:     "",
+		AllowCredentials: false,
+		ExposeHeaders:    "",
+		MaxAge:           int(time.Duration(12 * time.Hour).Seconds()),
+	})
+
 	// initialize new rest api server
-	restAPI := api.NewAPI("/api/", nil)
+	restAPI := api.NewAPI("/api/", cors, nil)
 
 	// register controllers with api
 	restAPI.Register("rooms", roomCont)

@@ -12,16 +12,18 @@ type M = map[string]any
 type API struct {
 	base     string
 	mux      *http.ServeMux
+	cors     http.Handler
 	handlers []handler
 }
 
-func NewAPI(base string, mux *http.ServeMux) *API {
+func NewAPI(base string, cors http.Handler, mux *http.ServeMux) *API {
 	if mux == nil {
 		mux = http.NewServeMux()
 	}
 	api := &API{
 		base:     base,
 		mux:      mux,
+		cors:     cors,
 		handlers: make([]handler, 0),
 	}
 	api.mux.Handle("/", http.RedirectHandler(api.base, http.StatusSeeOther))
@@ -47,6 +49,10 @@ func (api *API) Register(name string, re Resource) {
 }
 
 func (api *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// apply cors handler if we have one
+	if api.cors != nil {
+		api.cors.ServeHTTP(w, r)
+	}
 	// lookup resource handler
 	rh, pat := api.mux.Handler(r)
 	// do something with the pattern if we need to

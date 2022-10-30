@@ -5,6 +5,7 @@ import {Observable, of} from "rxjs";
 import {Booking} from "./model/Booking";
 import {formatDate} from "@angular/common";
 import {environment} from "../environments/environment";
+import {HttpClient} from "@angular/common/http";
 
 @Injectable({
   providedIn: 'root'
@@ -95,7 +96,11 @@ export class DataService {
   /*
    * DataService constructor
    */
-  constructor() {
+  constructor(private http: HttpClient) {
     console.log(environment.restUrl);
+  }
+
+  getUser(id: number) :Observable<User> {
+    return this.http.get<User>(environment.restUrl + `/api/users?id=${id}`);
   }
 }
