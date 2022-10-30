@@ -5,7 +5,7 @@ import (
 )
 
 type Room struct {
-	ID    string
-	Title string
-	Time  time.Time
+	ID    string    `json:"id"`
+	Title string    `json:"title"`
+	Time  time.Time `json:"time"`
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {Layout, LayoutCapacity, Room} from "./model/Room";
 import {User} from "./model/User";
-import {Observable, of} from "rxjs";
+import {map, Observable, of} from "rxjs";
 import {Booking} from "./model/Booking";
 import {formatDate} from "@angular/common";
 import {environment} from "../environments/environment";
@@ -101,6 +101,11 @@ export class DataService {
   }
 
   getUser(id: number) :Observable<User> {
-    return this.http.get<User>(environment.restUrl + `/api/users?id=${id}`);
+    return this.http.get<User>(environment.restUrl + `/api/users?id=${id}`)
+      .pipe(
+        map(data =>{
+          return User.fromHttp(data);
+        })
+      );
   }
 }

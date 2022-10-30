@@ -5,12 +5,12 @@ import (
 )
 
 type Booking struct {
-	ID           string
-	Title        string
-	User         string // user id
-	Room         string // room id
-	Date         string
-	StartTime    time.Time
-	EndTime      time.Time
-	Participants int
+	ID           string    `json:"id"`
+	Title        string    `json:"title"`
+	User         string    `json:"user"` // user id
+	Room         string    `json:"room"` // room id
+	Date         string    `json:"date"`
+	StartTime    time.Time `json:"start_time"`
+	EndTime      time.Time `json:"end_time"`
+	Participants int       `json:"participants"`
 }

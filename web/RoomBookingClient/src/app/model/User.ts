@@ -6,4 +6,12 @@ export class User {
     if (id) { this.id = id }
     if (name) { this.name = name }
   }
+
+  getRole():string {
+    return 'standard';
+  }
+
+  static fromHttp(u: User) :User {
+    return new User(u.id, u.name);
+  }
 }

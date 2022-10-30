@@ -3,6 +3,7 @@ import {formatDate} from "@angular/common";
 import {Booking} from "../model/Booking";
 import {DataService} from "../data.service";
 import {ActivatedRoute, Router} from "@angular/router";
+import {User} from "../model/User";
 
 @Component({
   selector: 'app-calendar',
@@ -24,6 +25,7 @@ export class CalendarComponent implements OnInit {
       next => {
         console.log(next);
         console.log(typeof next);
+        console.log(next.getRole());
       }
     );
     this.route.queryParams.subscribe(
