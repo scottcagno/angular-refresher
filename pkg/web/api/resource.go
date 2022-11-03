@@ -1,43 +1,8 @@
 package api
 
 import (
-	"errors"
 	"net/http"
 )
-
-var (
-	// repository errors
-	ErrNone         = errors.New("there is nothing to return")
-	ErrNoMatchFound = errors.New("nothing matched the provided key")
-	ErrBadType      = errors.New("type provided was incorrect")
-)
-
-// type Repository interface {
-// 	FindAll() (any, error)
-// 	FindOne(id string) (any, error)
-// 	Insert(v any) error
-// 	Update(id string, t any) error
-// 	Delete(id string) error
-// 	Size() int
-// 	GetRepositorySet() any
-// 	Init(data map[string]any)
-// }
-
-//
-// type Repository[T any] interface {
-// 	FindAll() (T, error)
-// 	FindOne(id string) (T, error)
-// 	Insert(v any) error
-// 	Update(id string, t T) error
-// 	Delete(id string) error
-// 	Size() int
-// }
-
-// type Service interface {
-// 	InitService()
-// 	AddRepository(key string, val Repository)
-// 	GetRepository(key string) Repository
-// }
 
 // Resource is here to represent a rest resource. It can be used to
 // represent a single item or a collection of items and is purposely
