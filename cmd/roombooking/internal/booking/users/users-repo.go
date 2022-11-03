@@ -5,6 +5,39 @@ import (
 )
 
 type UserRepository struct {
+	api.Repository[*User, string]
+}
+
+func NewUserRepository() *UserRepository {
+	u := &UserRepository{
+		Repository: api.NewMemoryRepository[*User, string](),
+	}
+	u.init()
+	return u
+}
+
+func (repo *UserRepository) init() {
+	user1 := &User{
+		ID:   "1",
+		Name: "Dick Chesterwood",
+	}
+	user2 := &User{
+		ID:   "2",
+		Name: "Matt Greencroft",
+	}
+	var err error
+	err = repo.Insert(user1.ID, user1)
+	if err != nil {
+		panic(err)
+	}
+	err = repo.Insert(user2.ID, user2)
+	if err != nil {
+		panic(err)
+	}
+}
+
+/*
+type _UserRepository struct {
 	items []User
 }
 
@@ -100,3 +133,4 @@ func (r *UserRepository) Init(data map[string]any) {
 func (r *UserRepository) GetRepositorySet() any {
 	return r.items
 }
+*/

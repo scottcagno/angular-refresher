@@ -12,16 +12,16 @@ var (
 	ErrBadType      = errors.New("type provided was incorrect")
 )
 
-type Repository interface {
-	FindAll() (any, error)
-	FindOne(id string) (any, error)
-	Insert(v any) error
-	Update(id string, t any) error
-	Delete(id string) error
-	Size() int
-	GetRepositorySet() any
-	Init(data map[string]any)
-}
+// type Repository interface {
+// 	FindAll() (any, error)
+// 	FindOne(id string) (any, error)
+// 	Insert(v any) error
+// 	Update(id string, t any) error
+// 	Delete(id string) error
+// 	Size() int
+// 	GetRepositorySet() any
+// 	Init(data map[string]any)
+// }
 
 //
 // type Repository[T any] interface {
@@ -33,11 +33,11 @@ type Repository interface {
 // 	Size() int
 // }
 
-type Service interface {
-	InitService()
-	AddRepository(key string, val Repository)
-	GetRepository(key string) Repository
-}
+// type Service interface {
+// 	InitService()
+// 	AddRepository(key string, val Repository)
+// 	GetRepository(key string) Repository
+// }
 
 // Resource is here to represent a rest resource. It can be used to
 // represent a single item or a collection of items and is purposely

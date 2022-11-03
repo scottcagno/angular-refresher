@@ -7,11 +7,7 @@ import (
 )
 
 type Controller struct {
-	repo api.Repository
-}
-
-func (c *Controller) Inject(s api.Service) {
-	c.repo = s.GetRepository("BookingRepo")
+	*BookingRepository
 }
 
 func (c *Controller) Get(w http.ResponseWriter, r *http.Request) {

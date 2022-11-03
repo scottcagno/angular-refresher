@@ -7,18 +7,14 @@ import (
 )
 
 type Controller struct {
-	repo api.Repository
-}
-
-func (c *Controller) Inject(s api.Service) {
-	c.repo = s.GetRepository("RoomRepo")
+	*RoomRepository
 }
 
 func (c *Controller) Get(w http.ResponseWriter, r *http.Request) {
 	id, found := api.GetParam(r, "id")
 	if !found {
 		// handle, get all
-		rooms, err := c.repo.FindAll()
+		rooms, err := c.Find(func(r *Room) bool { return r != nil })
 		if err != nil {
 			api.WriteJSON(w, http.StatusExpectationFailed, err)
 			return
@@ -27,8 +23,8 @@ func (c *Controller) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// handle get one
-	room, err := c.repo.FindOne(id)
-	if err != nil {
+	room, err := c.Find(func(r *Room) bool { return r.ID == id })
+	if err != nil || len(room) != 1 {
 		api.WriteJSON(w, http.StatusExpectationFailed, err)
 		return
 	}
@@ -43,7 +39,7 @@ func (c *Controller) Add(w http.ResponseWriter, r *http.Request) {
 		api.WriteJSON(w, http.StatusExpectationFailed, err)
 		return
 	}
-	err = c.repo.Insert(newRoom)
+	err = c.Insert(newRoom.ID, &newRoom)
 	if err != nil {
 		api.WriteJSON(w, http.StatusExpectationFailed, err)
 		return
@@ -65,7 +61,7 @@ func (c *Controller) Set(w http.ResponseWriter, r *http.Request) {
 		api.WriteJSON(w, http.StatusExpectationFailed, err)
 		return
 	}
-	err = c.repo.Update(id, updatedRoom)
+	err = c.Update(id, &updatedRoom)
 	if err != nil {
 		api.WriteJSON(w, http.StatusExpectationFailed, err)
 		return
@@ -81,7 +77,7 @@ func (c *Controller) Del(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// locate room using id
-	err := c.repo.Delete(id)
+	err := c.Delete(id)
 	if err != nil {
 		api.WriteJSON(w, http.StatusExpectationFailed, err)
 		return
