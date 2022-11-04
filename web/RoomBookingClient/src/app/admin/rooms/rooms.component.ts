@@ -14,18 +14,38 @@ export class RoomsComponent implements OnInit {
   rooms !:Array<Room>;
   selectedRoom !:Room;
   action !:string;
+  loadingData = true;
+  message = "One moment please... getting the list of rooms."
+  maxRetry = 10;
 
   constructor(private dataService :DataService,
               private route :ActivatedRoute,
               private router :Router,
               private formResetService: FormResetService) {}
 
-  ngOnInit(): void {
+
+  loadData() {
     this.dataService.getRooms().subscribe(
       next => {
-        this.rooms = next
+        this.rooms = next;
+        this.loadingData = false;
+        this.processURLParams();
+      },
+      (error) => {
+        if (error.status === 0) {
+          this.maxRetry--;
+          if (this.maxRetry > 0) {
+            this.message = "Sorry, something went wrong, trying again, please wait."
+            this.loadData();
+          } else {
+            this.message = `Whoops, we seem to have encountered a ${error.status} error.`;
+          }
+        }
       }
     );
+  }
+
+  processURLParams() {
     this.route.queryParams.subscribe(
       (params) => {
         this.action = '';
@@ -45,6 +65,13 @@ export class RoomsComponent implements OnInit {
         }
       }
     );
+  }
+
+  ngOnInit(): void {
+
+    this.loadData();
+
+
   }
 
   selectRoom(id :number) {

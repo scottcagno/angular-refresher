@@ -29,6 +29,13 @@ export class DataService {
     );
   }
 
+  getRoom(id: number) :Observable<Room> {
+    return this.http.get<Room>(Room.endpoint(id))
+      .pipe(
+        map(data =>{ return Room.fromHttp(data) })
+      );
+  }
+
   addNewRoom(newRoom: Room) : Observable<Room> {
     // @ts-ignore
     return of(null);
@@ -57,6 +64,13 @@ export class DataService {
        return users;
      })
    );
+  }
+
+  getUser(id: number) :Observable<User> {
+    return this.http.get<User>(User.endpoint(id))
+      .pipe(
+        map(data =>{ return User.fromHttp(data) })
+      );
   }
 
   updateUser(user :User) :Observable<User> {
@@ -114,13 +128,5 @@ export class DataService {
   constructor(private http: HttpClient) {
     console.log(environment.restUrl);
   }
-
-  getUser(id: number) :Observable<User> {
-    return this.http.get<User>(User.endpoint(id))
-      .pipe(
-        map(data =>{ return User.fromHttp(data) })
-      );
-  }
-
 
 }

@@ -2,6 +2,7 @@ package users
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/scottcagno/angular-refresher/pkg/web/api"
 )
@@ -23,7 +24,12 @@ func (c *Controller) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// handle get one
-	user, err := c.Find(func(u *User) bool { return u.ID == id })
+	uid, err := strconv.Atoi(id)
+	if err != nil {
+		api.WriteJSON(w, http.StatusExpectationFailed, err)
+		return
+	}
+	user, err := c.Find(func(u *User) bool { return u.ID == uid })
 	if err != nil || len(user) != 1 {
 		api.WriteJSON(w, http.StatusExpectationFailed, err)
 		return
@@ -61,7 +67,12 @@ func (c *Controller) Set(w http.ResponseWriter, r *http.Request) {
 		api.WriteJSON(w, http.StatusExpectationFailed, err)
 		return
 	}
-	err = c.Update(id, &updateUser)
+	uid, err := strconv.Atoi(id)
+	if err != nil {
+		api.WriteJSON(w, http.StatusExpectationFailed, err)
+		return
+	}
+	err = c.Update(uid, &updateUser)
 	if err != nil {
 		api.WriteJSON(w, http.StatusExpectationFailed, err)
 		return
@@ -77,7 +88,12 @@ func (c *Controller) Del(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// locate room using id
-	err := c.Delete(id)
+	uid, err := strconv.Atoi(id)
+	if err != nil {
+		api.WriteJSON(w, http.StatusExpectationFailed, err)
+		return
+	}
+	err = c.Delete(uid)
 	if err != nil {
 		api.WriteJSON(w, http.StatusExpectationFailed, err)
 		return

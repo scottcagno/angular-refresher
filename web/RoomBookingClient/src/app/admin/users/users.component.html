@@ -24,6 +24,9 @@
         </td>
       </tr>
       </tbody>
+      <div *ngIf="loadingData" class="text-center">
+        <p>{{message}}</p>
+      </div>
     </table>
   </div>
   <div class="col-4">

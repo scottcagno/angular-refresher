@@ -5,12 +5,12 @@ import (
 )
 
 type UserRepository struct {
-	api.Repository[*User, string]
+	api.Repository[*User, int]
 }
 
 func NewUserRepository() *UserRepository {
 	u := &UserRepository{
-		Repository: api.NewMemoryRepository[*User, string](),
+		Repository: api.NewMemoryRepository[*User, int](),
 	}
 	u.init()
 	return u
@@ -18,11 +18,11 @@ func NewUserRepository() *UserRepository {
 
 func (repo *UserRepository) init() {
 	user1 := &User{
-		ID:   "1",
+		ID:   1,
 		Name: "Dick Chesterwood",
 	}
 	user2 := &User{
-		ID:   "2",
+		ID:   2,
 		Name: "Matt Greencroft",
 	}
 	var err error

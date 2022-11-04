@@ -14,17 +14,27 @@ export class UsersComponent implements OnInit {
   users !: Array<User>;
   selectedUser !: User;
   action !:string;
+  message = 'Loading data... please wait';
+  loadingData = true;
 
   constructor(private dataService :DataService,
               private route :ActivatedRoute,
               private router :Router,
               private formResetService: FormResetService) {}
 
-  ngOnInit(): void {
+  loadData() {
     this.dataService.getUsers().subscribe(
       next => {
-      this.users = next
-    });
+        this.users = next
+        this.loadingData = false;
+        this.getURLParams();
+      },
+      error => {
+        this.message = 'An error occurred -- please contact support.'
+      });
+  }
+
+  getURLParams() {
     this.route.queryParams.subscribe(
       (params) => {
         const id = params['id'];
@@ -38,6 +48,11 @@ export class UsersComponent implements OnInit {
         }
       }
     );
+  }
+
+  ngOnInit(): void {
+
+    this.loadData();
   }
 
   selectUser(id :number) {
