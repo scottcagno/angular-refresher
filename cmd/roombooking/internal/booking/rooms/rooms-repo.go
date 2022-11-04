@@ -5,6 +5,7 @@ import (
 )
 
 type RoomRepository struct {
+	nextID int
 	api.Repository[*Room, int]
 }
 
@@ -25,6 +26,8 @@ func (repo *RoomRepository) init() {
 
 	room3 := NewRoom(3, "Main conference room", "Third floor")
 	room3.AddLayoutCapacity(NewLayoutCapacity(Layout_BOARD, 12))
+
+	repo.nextID = 4
 
 	var err error
 	err = repo.Insert(room1.ID, room1)

@@ -19,6 +19,7 @@ func (c *Controller) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Controller) Add(w http.ResponseWriter, r *http.Request) {
+
 	api.WriteJSON(w, http.StatusOK, api.M{"booking controller": "add"})
 }
 

@@ -29,25 +29,16 @@ export class DataService {
     );
   }
 
-  getRoom(id: number) :Observable<Room> {
-    return this.http.get<Room>(Room.endpoint(id))
-      .pipe(
-        map(data =>{ return Room.fromHttp(data) })
-      );
-  }
-
   addNewRoom(newRoom: Room) : Observable<Room> {
-    // @ts-ignore
-    return of(null);
+    return this.http.post<Room>(Room.endpoint(), newRoom);
   }
 
   updateRoom(room: Room): Observable<Room> {
-    // @ts-ignore
-    return of(null);
+    return this.http.put<Room>(Room.endpoint(room.id), room);
   }
 
-  deleteRoom(id: number) : Observable<Array<User>> {
-    return this.http.get<Array<User>>(User.endpoint())
+  deleteRoom(id: number) : Observable<Room> {
+    return this.http.delete<Room>(Room.endpoint(id))
   }
 
 
@@ -78,13 +69,12 @@ export class DataService {
   }
 
   addNewUser(newUser :User, password :string) :Observable<User> {
-    // @ts-ignore
-    return of(null);
+    const fullUser = {id:newUser.id, name:newUser.name, password:password}
+    return this.http.post<User>(User.endpoint(), fullUser);
   }
 
   deleteUser(id: number) : Observable<any> {
-    // @ts-ignore
-    return of(null);
+    return this.http.delete<User>(User.endpoint(id));
   }
 
   resetUserPassword(id: number) :Observable<any> {

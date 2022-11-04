@@ -1,7 +1,5 @@
 import {environment} from "../../environments/environment";
 
-
-
 export class User {
   id !:number;
   name !:string;

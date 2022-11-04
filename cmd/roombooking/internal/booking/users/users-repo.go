@@ -5,6 +5,7 @@ import (
 )
 
 type UserRepository struct {
+	nextID int
 	api.Repository[*User, int]
 }
 
@@ -25,6 +26,7 @@ func (repo *UserRepository) init() {
 		ID:   2,
 		Name: "Matt Greencroft",
 	}
+	repo.nextID = 3
 	var err error
 	err = repo.Insert(user1.ID, user1)
 	if err != nil {

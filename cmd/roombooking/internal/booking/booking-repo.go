@@ -9,6 +9,7 @@ import (
 )
 
 type BookingRepository struct {
+	nextID         int
 	UserRepository *users.UserRepository
 	RoomRepository *rooms.RoomRepository
 	Repository     api.Repository[*Booking, string]
@@ -53,6 +54,7 @@ func (b *BookingRepository) init() {
 		EndTime:      time.Now().Add(31 * time.Hour),
 		Participants: 7,
 	}
+	b.nextID = 3
 	err = b.Repository.Insert(booking1.ID, booking1)
 	if err != nil {
 		panic(err)

@@ -3,7 +3,6 @@ package rooms
 import (
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/scottcagno/angular-refresher/pkg/web/api"
 )
@@ -13,7 +12,6 @@ type Controller struct {
 }
 
 func (c *Controller) Get(w http.ResponseWriter, r *http.Request) {
-	time.Sleep(3 * time.Second)
 	id, found := api.GetParam(r, "id")
 	if !found {
 		// handle, get all
@@ -46,6 +44,10 @@ func (c *Controller) Add(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		api.WriteJSON(w, http.StatusExpectationFailed, err)
 		return
+	}
+	if newRoom.ID == 0 {
+		newRoom.ID = c.nextID
+		c.nextID++
 	}
 	err = c.Insert(newRoom.ID, &newRoom)
 	if err != nil {

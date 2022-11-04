@@ -1,8 +1,10 @@
 <div class="edit">
   <legend>{{ room.id == null ? 'Add' : 'Edit'}}</legend>
   <hr>
-  <div class="card card-body bg-warning mb-3"></div>
 
+  <div *ngIf="message">{{message}}</div>
+
+  <div class="card card-body bg-warning mb-3"></div>
   <form autocomplete="off" readonly="false" novalidate [formGroup]="roomForm">
     <div class="mb-3">
       <label for="name" class="form-label">Name</label>

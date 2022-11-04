@@ -45,6 +45,10 @@ func (c *Controller) Add(w http.ResponseWriter, r *http.Request) {
 		api.WriteJSON(w, http.StatusExpectationFailed, err)
 		return
 	}
+	if newUser.ID == 0 {
+		newUser.ID = c.nextID
+		c.nextID++
+	}
 	err = c.Insert(newUser.ID, &newUser)
 	if err != nil {
 		api.WriteJSON(w, http.StatusExpectationFailed, err)
