@@ -1,3 +1,4 @@
+import {environment} from "../../environments/environment";
 
 export class Room {
 
@@ -17,6 +18,21 @@ export class Room {
     return `${this.name} ${this.location}`
   }
 
+  static fromHttp(data: Room) :Room {
+    const newRoom = new Room(data.id, data.name, data.location);
+    for (const lc of data.capacities) {
+      newRoom.capacities.push(LayoutCapacity.fromHttp(lc));
+    }
+    return newRoom;
+  }
+
+  static endpoint(id ?:number):string {
+    if (id) {
+      return environment.restUrl + `/api/rooms?id=${id}`
+    }
+    return environment.restUrl + `/api/rooms`
+  }
+
 }
 
 export class LayoutCapacity {
@@ -31,6 +47,12 @@ export class LayoutCapacity {
   toString() :string {
     return `${this.layout}`
   }
+
+  static fromHttp(data: LayoutCapacity) :LayoutCapacity {
+    return new LayoutCapacity(data.layout, data.capacity);
+  }
+
+
 }
 
 export enum Layout {
@@ -38,6 +60,7 @@ export enum Layout {
   USHAPE = 'U-Shape',
   BOARD = 'Board Meeting'
 }
+
 
 
 // export namespace Layout {

@@ -10,6 +10,7 @@ import (
 	"github.com/scottcagno/angular-refresher/cmd/roombooking/internal/booking/users"
 	"github.com/scottcagno/angular-refresher/cmd/roombooking/services"
 	"github.com/scottcagno/angular-refresher/pkg/web/api"
+	"github.com/scottcagno/angular-refresher/pkg/web/api/middleware"
 )
 
 func main() {
@@ -27,8 +28,8 @@ func main() {
 	bookingCont := &booking.Controller{BookingRepository: ds.BookingRepo}
 
 	// initialize our cors handler
-	cors := api.CORSHandler(
-		&api.CORSConfig{
+	cors := middleware.CORSHandler(
+		&middleware.CORSConfig{
 			AllowOrigins:     "http://localhost:4200/api/**",
 			AllowMethods:     "GET,POST,PUT,DELETE",
 			AllowHeaders:     "",
@@ -39,7 +40,7 @@ func main() {
 	)
 
 	// initialize new rest api server
-	restAPI := api.NewAPI("/api/", cors, nil)
+	restAPI := api.NewAPI("/api/", cors, nil, nil)
 
 	// register controllers with api
 	restAPI.Register("rooms", roomCont)

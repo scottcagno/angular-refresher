@@ -3,27 +3,36 @@ package api
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"path/filepath"
+
+	"github.com/scottcagno/angular-refresher/pkg/web/api/middleware"
 )
 
 type M = map[string]any
 
 type API struct {
 	base     string
-	mux      *http.ServeMux
 	cors     http.Handler
+	logger   *log.Logger
+	mux      *http.ServeMux
 	handlers []handler
 }
 
-func NewAPI(base string, cors http.Handler, mux *http.ServeMux) *API {
+func NewAPI(base string, cors http.Handler, logger *log.Logger, mux *http.ServeMux) *API {
+	if logger == nil {
+		logger = log.New(os.Stderr, "[DEFAULT] ", log.LstdFlags)
+	}
 	if mux == nil {
 		mux = http.NewServeMux()
 	}
 	api := &API{
 		base:     base,
-		mux:      mux,
 		cors:     cors,
+		logger:   logger,
+		mux:      mux,
 		handlers: make([]handler, 0),
 	}
 	api.mux.Handle("/", http.RedirectHandler(api.base, http.StatusSeeOther))
@@ -45,7 +54,7 @@ func (api *API) Register(name string, re Resource) {
 		reso: re,
 	}
 	api.handlers = append(api.handlers, *h)
-	api.mux.Handle(h.path, BasicLogger(h))
+	api.mux.Handle(h.path, middleware.WithLogging(api.logger, h))
 }
 
 func (api *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -102,8 +111,8 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case http.MethodDelete:
 		h.reso.Del(w, r)
 	case http.MethodOptions:
-		Options(w, r)
+		middleware.Options(w, r)
 	default:
-		NotFound(w, r)
+		middleware.NotFound(w, r)
 	}
 }

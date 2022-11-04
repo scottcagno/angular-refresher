@@ -16,8 +16,17 @@ export class DataService {
    * Room methods
    */
   getRooms() :Observable<Array<Room>> {
-    // @ts-ignore
-    return of(null);
+    return this.http.get<Array<Room>>(Room.endpoint()).pipe(
+      map(
+        data => {
+          const rooms = new Array<Room>();
+          for (const room of data) {
+            rooms.push(Room.fromHttp(room));
+          }
+          return rooms;
+        }
+      )
+    );
   }
 
   addNewRoom(newRoom: Room) : Observable<Room> {
@@ -39,8 +48,15 @@ export class DataService {
    * User methods
    */
   getUsers() :Observable<Array<User>> {
-    // @ts-ignore
-    return of(null);
+   return this.http.get<Array<User>>(User.endpoint()).pipe(
+     map(data => {
+       const users = new Array<User>();
+       for (const user of data) {
+         users.push(User.fromHttp(user));
+       }
+       return users;
+     })
+   );
   }
 
   updateUser(user :User) :Observable<User> {

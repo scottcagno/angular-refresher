@@ -1,4 +1,4 @@
-package api
+package middleware
 
 // HTTP Headers were copied from net/http.
 const (
