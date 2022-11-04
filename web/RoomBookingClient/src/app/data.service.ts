@@ -37,7 +37,7 @@ export class DataService {
     return this.http.put<Room>(Room.endpoint(room.id), room);
   }
 
-  deleteRoom(id: number) : Observable<Room> {
+  deleteRoom(id: number) : Observable<any> {
     return this.http.delete<Room>(Room.endpoint(id))
   }
 

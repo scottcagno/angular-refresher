@@ -6,13 +6,14 @@
 <!--  </form>-->
   <button class="btn btn-sm btn-outline-warning" (click)="editRoom()">Edit</button>
   <button class="btn btn-sm btn-outline-warning m-1" (click)="deleteRoom()">Delete</button>
+  <div *ngIf="message">{{message}}</div>
   <div *ngIf="room">
     <br>
-    {{ room!.id }}
+    {{ room.id }}
     <br>
-    {{ room!.name }}
+    {{ room.name }}
     <br>
-    {{ room!.location }}
+    {{ room.location }}
     <br>
     <table>
       <tr *ngFor="let layoutCap of room.capacities">
