@@ -74,8 +74,7 @@ export class DataService {
   }
 
   updateUser(user :User) :Observable<User> {
-    // @ts-ignore
-    return of(null);
+    return this.http.put<User>(User.endpoint(user.id), user);
   }
 
   addNewUser(newUser :User, password :string) :Observable<User> {

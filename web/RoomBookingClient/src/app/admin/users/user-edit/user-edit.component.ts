@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {User} from "../../../model/User";
 import {DataService} from "../../../data.service";
 import {Router} from "@angular/router";
@@ -14,6 +14,10 @@ export class UserEditComponent implements OnInit, OnDestroy {
 
   @Input()
   user !:User;
+
+  @Output()
+  dataChangedEvent = new EventEmitter();
+
   formUser !:User; // just for the form
   password !:string;
   password2 !:string;
@@ -57,13 +61,22 @@ export class UserEditComponent implements OnInit, OnDestroy {
     if (this.formUser.id == null) {
       // add new
       this.dataService.addNewUser(this.formUser, this.password).subscribe((user)=>{
+        this.dataChangedEvent.emit();
         this.router.navigate(['admin','users'], {queryParams:{id: user.id, action: 'view'}});
-      });
+      },
+        error => {
+          this.message = 'Something went wrong and the data was not saved. You may want to try again.';
+        }
+    );
     } else {
-      // edit exsting
+      // edit existing
       this.dataService.updateUser(this.formUser).subscribe((user)=>{
+        this.dataChangedEvent.emit();
         this.router.navigate(['admin','users'], {queryParams:{id: user.id, action: 'view'}});
-      });
+      },
+        error => {
+        this.message = 'Something went wrong and the data was not saved. You may want to try again.';
+        });
     }
   }
 
