@@ -34,7 +34,7 @@
   <div class="col-4">
     <div class="card">
       <div class="card-body">
-        <app-room-detail *ngIf="action === 'view'" [room]="selectedRoom"></app-room-detail>
+        <app-room-detail *ngIf="action === 'view'" [room]="selectedRoom" (dataChanged)="loadData()"></app-room-detail>
         <app-room-edit *ngIf="action === 'edit'" [room]="selectedRoom" (dataChanged)="loadData()"></app-room-edit>
       </div>
     </div>
