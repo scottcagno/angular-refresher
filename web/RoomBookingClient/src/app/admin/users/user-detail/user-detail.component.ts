@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {User} from "../../../model/User";
 import {Router} from "@angular/router";
 import {DataService} from "../../../data.service";
@@ -13,6 +13,9 @@ export class UserDetailComponent implements OnInit {
   @Input()
   user !:User;
 
+  @Output()
+  dataChanged = new EventEmitter();
+
   constructor(private dataService :DataService, private router :Router) { }
 
   ngOnInit(): void {
@@ -25,7 +28,11 @@ export class UserDetailComponent implements OnInit {
   deleteUser() {
     this.dataService.deleteUser(this.user.id).subscribe(
       next => {
+        this.dataChanged.emit();
         this.router.navigate(['admin','users']);
+      },
+      error => {
+
       }
     );
   }
