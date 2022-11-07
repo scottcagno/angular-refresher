@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -85,7 +84,6 @@ func CORSHandler(c *CORSConfig) http.Handler {
 	}
 skipSetDefaults:
 	fn := func(w http.ResponseWriter, r *http.Request) {
-		log.Println("HIT CORS HANDLER...", r.RequestURI)
 		switch r.Method {
 		// handle a pre-flight request
 		case http.MethodOptions:
