@@ -70,6 +70,15 @@ func (api *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	rh.ServeHTTP(w, r)
 }
 
+func (api *API) HandleRequestMapping(mapping RequestMapping) {
+	fmt.Printf("type=%T, value=%#v\n", mapping, mapping)
+}
+
+func (api *API) HandleRequestMappingFunc(reso ResourceV2, handler http.Handler) {
+	fmt.Printf("type=%T, value=%#v\n", reso, reso)
+	fmt.Printf("type=%T, value=%#v\n", handler, handler)
+}
+
 type handler struct {
 	name string
 	path string
@@ -90,6 +99,14 @@ func writeReqCtx(r *http.Request, key, val any) *http.Request {
 func readReqCtx(r *http.Request, key any) any {
 	// get the value from the request context
 	return r.Context().Value(key)
+}
+
+func HasParam(r *http.Request, key string) bool {
+	params := r.URL.Query()
+	if params.Has(key) {
+		return true
+	}
+	return false
 }
 
 func GetParam(r *http.Request, key string) (string, bool) {
