@@ -12,14 +12,14 @@ type BookingRepository struct {
 	nextID         int
 	UserRepository *users.UserRepository
 	RoomRepository *rooms.RoomRepository
-	Repository     api.Repository[*Booking, string]
+	Repository     api.Repository[*Booking, int]
 }
 
 func NewBookingRepository(userRepo *users.UserRepository, roomRepo *rooms.RoomRepository) *BookingRepository {
 	b := &BookingRepository{
 		UserRepository: userRepo,
 		RoomRepository: roomRepo,
-		Repository:     api.NewMemoryRepository[*Booking, string](),
+		Repository:     api.NewMemoryRepository[*Booking, int](),
 	}
 	b.init()
 	return b
@@ -35,7 +35,7 @@ func (b *BookingRepository) init() {
 		panic(err)
 	}
 	booking1 := &Booking{
-		ID:           "1",
+		ID:           1,
 		Title:        "Conference call with CEO",
 		User:         *userData[1],
 		Room:         *roomData[0],
@@ -45,7 +45,7 @@ func (b *BookingRepository) init() {
 		Participants: 4,
 	}
 	booking2 := &Booking{
-		ID:           "2",
+		ID:           2,
 		Title:        "Some important meeting",
 		User:         *userData[0],
 		Room:         *roomData[1],

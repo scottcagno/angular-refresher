@@ -8,7 +8,7 @@ import (
 )
 
 type Booking struct {
-	ID           string     `json:"id"`
+	ID           int        `json:"id"`
 	Title        string     `json:"title"`
 	User         users.User `json:"user"` // user id
 	Room         rooms.Room `json:"room"` // room id

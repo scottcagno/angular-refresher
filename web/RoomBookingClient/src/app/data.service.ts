@@ -91,8 +91,16 @@ export class DataService {
   }
 
   getBookings(date: string) : Observable<Array<Booking>> {
-    // @ts-ignore
-    return of(null);
+    return this.http.get<Array<Booking>>(Booking.endpointByDate(date))
+      .pipe(
+        map(data => {
+        const bookings = new Array<Booking>();
+          for (const booking of data) {
+            bookings.push(Booking.fromHttp(booking));
+          }
+          return bookings
+    })
+    );
   }
 
   saveBooking(booking :Booking) :Observable<Booking> {
@@ -106,8 +114,7 @@ export class DataService {
   }
 
   deleteBooking(id :number) :Observable<any> {
-    // @ts-ignore
-    return of(null);
+    return this.http.delete<Booking>(Booking.endpoint(id));
   }
 
 
