@@ -57,6 +57,14 @@ func (api *API) Register(name string, re Resource) {
 	api.mux.Handle(h.path, middleware.WithLogging(api.logger, h))
 }
 
+func (api *API) RegisterCustom(name string, re CustomResource) {
+	h := &customHandler{
+		path: filepath.ToSlash(filepath.Join(api.base, name)),
+		fn:   re.Custom(),
+	}
+	api.mux.Handle(h.path, middleware.WithLogging(api.logger, h))
+}
+
 func (api *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// apply cors handler if we have one
 	if api.cors != nil {
@@ -77,6 +85,15 @@ func (api *API) HandleRequestMapping(mapping RequestMapping) {
 func (api *API) HandleRequestMappingFunc(reso ResourceV2, handler http.Handler) {
 	fmt.Printf("type=%T, value=%#v\n", reso, reso)
 	fmt.Printf("type=%T, value=%#v\n", handler, handler)
+}
+
+type customHandler struct {
+	path string
+	fn   http.HandlerFunc
+}
+
+func (ch customHandler) IsNil() bool {
+	return ch.path == "" && ch.fn == nil
 }
 
 type handler struct {
@@ -131,5 +148,13 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		middleware.Options(w, r)
 	default:
 		middleware.NotFound(w, r)
+	}
+}
+
+func (h *customHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// check for a custom handler request
+	if h.path == r.URL.Path {
+		h.fn(w, r)
+		return
 	}
 }

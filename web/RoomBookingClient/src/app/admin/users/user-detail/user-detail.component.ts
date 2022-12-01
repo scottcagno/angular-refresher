@@ -14,7 +14,9 @@ export class UserDetailComponent implements OnInit {
   user !:User;
 
   @Output()
-  dataChanged = new EventEmitter();
+  dataChangedEvent = new EventEmitter();
+
+  message = '';
 
   constructor(private dataService :DataService, private router :Router) { }
 
@@ -26,22 +28,29 @@ export class UserDetailComponent implements OnInit {
   }
 
   deleteUser() {
+    this.message = 'deleting user...';
     this.dataService.deleteUser(this.user.id).subscribe(
       next => {
-        this.dataChanged.emit();
-        this.router.navigate(['admin','users']);
+        this.dataChangedEvent.emit();
+        this.router.navigate(['admin','users'] );
+        this.message = '';
       },
       error => {
-
+        this.message = 'Sorry, this user cannot be deleted at this time.';
       }
     );
   }
 
   resetPassword() {
-    this.dataService.resetUserPassword(this.user.id).subscribe(
+    this.message = 'Please wait, resetting password...'
+    this.dataService.resetPassword(this.user.id).subscribe(
       next => {
-        console.log('password for '+ this.user.name +' has been reset');
-        this.router.navigate(['admin','users']);
+        this.message = `${this.user.name}'s password has been reset`;
+        //console.log('password for '+ this.user.name +' has been reset');
+        //this.router.navigate(['admin','users']);
+      },
+      error => {
+        this.message = 'Sorry, something went wrong';
       }
     );
   }

@@ -27,6 +27,11 @@ type ResourceV2 interface {
 	RequestMappingFunc(mapping RequestMapping) int
 }
 
+type CustomResource interface {
+	// Custom is a custom defined handler
+	Custom() http.HandlerFunc
+}
+
 // ResourceV1 is here to represent a rest resource. It can be used to
 // represent a single item or a collection of items and is purposely
 // created to easily cater to many situations.

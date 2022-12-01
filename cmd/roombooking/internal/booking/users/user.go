@@ -1,8 +1,6 @@
 package users
 
 import (
-	"net/http"
-
 	"github.com/scottcagno/angular-refresher/pkg/web/api"
 )
 
@@ -18,15 +16,15 @@ func (u *User) RequestMappingFunc(mapping api.RequestMapping) int {
 
 type mappingFunc = func(meth, path string, params ...string) int
 
-func DoSomething(meth, path string, params ...string) int {
-	fn := func(w http.ResponseWriter, r *http.Request) {
-		keys := make([]string, 0, len(r.URL.Query()))
-		for k := range r.URL.Query() {
-			keys = append(keys, k)
-		}
-	}
-	return 1
-}
+// func DoSomething(meth, path string, params ...string) int {
+// 	fn := func(w http.ResponseWriter, r *http.Request) {
+// 		keys := make([]string, 0, len(r.URL.Query()))
+// 		for k := range r.URL.Query() {
+// 			keys = append(keys, k)
+// 		}
+// 	}
+// 	return 1
+// }
 
 //
 // func (u *User) RequestMappingFunc(method, path string, requiredParams ...string) int {

@@ -23,4 +23,9 @@ export class User {
     }
     return environment.restUrl + `/api/users`
   }
+
+  static resetPassword(id ?:number) :string {
+    return environment.restUrl + `/api/users/resetPassword?id=${id}`
+  }
 }
+

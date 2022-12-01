@@ -104,3 +104,32 @@ func (c *Controller) Del(w http.ResponseWriter, r *http.Request) {
 	}
 	api.WriteJSON(w, http.StatusOK, nil)
 }
+
+func (c *Controller) Custom() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, found := api.GetParam(r, "id")
+		if !found {
+			api.WriteJSON(w, http.StatusExpectationFailed, "required an ID")
+			return
+		}
+		// handle get one
+		uid, err := strconv.Atoi(id)
+		if err != nil {
+			api.WriteJSON(w, http.StatusExpectationFailed, err)
+			return
+		}
+		user, err := c.Find(func(u *User) bool { return u.ID == uid })
+		if err != nil || len(user) != 1 {
+			api.WriteJSON(w, http.StatusExpectationFailed, err)
+			return
+		}
+		user[0].Password = "reset"
+		err = c.Update(user[0].ID, user[0])
+		if err != nil {
+			api.WriteJSON(w, http.StatusExpectationFailed, err)
+			return
+		}
+		api.WriteJSON(w, http.StatusOK, user)
+		return
+	}
+}

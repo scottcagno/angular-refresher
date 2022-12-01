@@ -4,6 +4,7 @@
   <button class="btn btn-sm btn-outline-warning m-1" (click)="editUser()">Edit</button>
   <button class="btn btn-sm btn-outline-warning m-1" (click)="deleteUser()">Delete</button>
   <button class="btn btn-sm btn-outline-warning m-1" (click)="resetPassword()">Reset Password</button>
+  <div *ngIf="message" class="bg-warning p-5">{{message}}</div>
   <!--  <form id="" method="" action="" autocomplete="off" readonly="true" novalidate>-->
   <!--    -->
   <!--  </form>-->

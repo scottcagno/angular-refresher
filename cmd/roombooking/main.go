@@ -46,6 +46,7 @@ func main() {
 	restAPI.Register("rooms", roomCont)
 	restAPI.Register("users", userCont)
 	restAPI.Register("bookings", bookingCont)
+	restAPI.RegisterCustom("users/resetPassword", userCont)
 
 	// serve the api
 	log.Fatal(http.ListenAndServe(":8080", restAPI))

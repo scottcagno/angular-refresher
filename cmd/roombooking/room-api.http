@@ -33,3 +33,16 @@ Content-Type: application/json
 }
 
 ###
+// Reset a users password
+GET http://localhost:8080/api/users/resetPassword?id=2
+Accept: application/json
+
+###
+// Get All Users
+GET http://localhost:8080/api/users
+Accept: application/json
+
+###
+// Get One User
+GET http://localhost:8080/api/users?id=2
+Accept: application/json

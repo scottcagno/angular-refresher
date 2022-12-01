@@ -77,8 +77,8 @@ export class DataService {
     return this.http.delete<User>(User.endpoint(id));
   }
 
-  resetUserPassword(id: number) :Observable<any> {
-    return of(null);
+  resetPassword(id: number) :Observable<any> {
+    return this.http.get<User>(User.resetPassword(id));
   }
 
 
