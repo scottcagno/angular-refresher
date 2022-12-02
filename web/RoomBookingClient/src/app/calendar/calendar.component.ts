@@ -28,16 +28,16 @@ export class CalendarComponent implements OnInit {
 
   loadData(): void  {
     this.message = 'Loading data....'
-    this.dataService.getUser(2).subscribe(
-      next => {
-        console.log(next);
-        console.log(typeof next);
-        console.log(next.getRole());
-      },
-      error => {
-        this.message = 'Sorry -- error loading user data'
-      }
-    );
+    // this.dataService.getUser(2).subscribe(
+    //   next => {
+    //     console.log(next);
+    //     console.log(typeof next);
+    //     console.log(next.getRole());
+    //   },
+    //   error => {
+    //     this.message = 'Sorry -- error loading user data'
+    //   }
+    // );
     this.route.queryParams.subscribe(
       params =>{
         this.selectedDate = params['date'];

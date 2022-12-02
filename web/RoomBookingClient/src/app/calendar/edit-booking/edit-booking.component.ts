@@ -46,6 +46,7 @@ export class EditBookingComponent implements OnInit {
         )
         .subscribe(
         next => {
+          console.log(this.booking, next);
           this.booking = next;
           this.dataLoaded = true;
           this.message = '';
