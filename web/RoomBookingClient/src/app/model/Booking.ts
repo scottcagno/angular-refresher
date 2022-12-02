@@ -29,17 +29,17 @@ export class Booking {
   }
 
   static fromHttp(b: Booking) :Booking {
-    const newBooking = new Booking({});
-    newBooking.id = b.id;
-    newBooking.room = Room.fromHttp(b.room);
-    newBooking.user = User.fromHttp(b.user);
-    newBooking.layout = b.layout;
-    newBooking.title = b.title;
-    newBooking.date = b.date;
-    newBooking.startTime = b.startTime;
-    newBooking.endTime = b.endTime;
-    newBooking.participants = b.participants;
-    return newBooking;
+    return new Booking({
+      id: b.id,
+      room : Room.fromHttp(b.room) as Room,
+      user : User.fromHttp(b.user) as User,
+      layout: b.layout,
+      title: b.title,
+      date : b.date,
+      startTime: b.startTime,
+      endTime: b.endTime,
+      participants: b.participants,
+    }) as Booking;
   }
 
   onCancel() {}

@@ -23,7 +23,7 @@ export class Room {
     for (const lc of data.capacities) {
       newRoom.capacities.push(LayoutCapacity.fromHttp(lc));
     }
-    return newRoom;
+    return newRoom as Room;
   }
 
   static endpoint(id ?:number):string {

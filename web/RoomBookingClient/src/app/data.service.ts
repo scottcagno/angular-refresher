@@ -86,8 +86,10 @@ export class DataService {
    * Booking methods
    */
   getBooking(id: number) : Observable<Booking> {
-    // @ts-ignore
-    return of(null);
+    return this.http.get<Booking>(Booking.endpoint(id))
+      .pipe(
+        map( data => Booking.fromHttp(data) )
+      );
   }
 
   getBookings(date: string) : Observable<Array<Booking>> {

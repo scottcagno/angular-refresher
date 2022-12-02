@@ -1,7 +1,8 @@
 <div class="edit">
-  <legend>{{ booking.id == null ? 'Add' : 'Edit'}} Booking</legend>
+  <legend>{{ booking?.id == null ? 'Add' : 'Edit'}} Booking {{ booking?.id != null }}</legend>
   <hr>
-  <form autocomplete="off" readonly="false" novalidate class="row g-3">
+  <div class="card card-body bg-warning mb-3" *ngIf="message">{{ message }}</div>
+  <form *ngIf="dataLoaded" autocomplete="off" readonly="false" novalidate class="row g-3">
 
     <div class="mb-3 col-4">
       <label for="date" class="form-label">Date</label>

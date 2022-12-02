@@ -22,8 +22,7 @@ export class RoomDetailComponent implements OnInit {
 
   constructor(
     private router :Router,
-    private dataService : DataService,
-    private modal : NgbModal) { }
+    private dataService : DataService) { }
 
   ngOnInit(): void {
   }

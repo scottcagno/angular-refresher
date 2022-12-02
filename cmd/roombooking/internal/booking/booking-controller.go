@@ -1,6 +1,7 @@
 package booking
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -12,23 +13,43 @@ type Controller struct {
 }
 
 func (c *Controller) Get(w http.ResponseWriter, r *http.Request) {
-	param, found := api.GetParam(r, "date")
-	if !found {
-		// handle, get all
-		users, err := c.Repository.Find(func(b *Booking) bool { return b != nil })
+	if api.HasParam(r, "date") {
+		log.Println("BookingsController with DATE called...")
+		param, _ := api.GetParam(r, "date")
+		// if !found {
+		// 	// handle, get all
+		// 	users, err := c.Repository.Find(func(b *Booking) bool { return b != nil })
+		// 	if err != nil {
+		// 		api.WriteJSON(w, http.StatusExpectationFailed, err)
+		// 		return
+		// 	}
+		// 	api.WriteJSON(w, http.StatusOK, users)
+		// 	return
+		// }
+		bookings, err := c.Repository.Find(func(b *Booking) bool { return b.Date == param })
+		if err != nil || len(bookings) < 1 {
+			api.WriteJSON(w, http.StatusExpectationFailed, err)
+			return
+		}
+		api.WriteJSON(w, http.StatusOK, bookings)
+		return
+	}
+	if api.HasParam(r, "id") {
+		log.Println("BookingsController with ID called...")
+		param, _ := api.GetParam(r, "id")
+		id, err := strconv.Atoi(param)
 		if err != nil {
 			api.WriteJSON(w, http.StatusExpectationFailed, err)
 			return
 		}
-		api.WriteJSON(w, http.StatusOK, users)
+		bookings, err := c.Repository.Find(func(b *Booking) bool { return b.ID == id })
+		if err != nil || len(bookings) != 1 {
+			api.WriteJSON(w, http.StatusExpectationFailed, err)
+			return
+		}
+		api.WriteJSON(w, http.StatusOK, bookings)
 		return
 	}
-	bookings, err := c.Repository.Find(func(b *Booking) bool { return b.Date == param })
-	if err != nil || len(bookings) < 1 {
-		api.WriteJSON(w, http.StatusExpectationFailed, err)
-		return
-	}
-	api.WriteJSON(w, http.StatusOK, bookings)
 	return
 }
 

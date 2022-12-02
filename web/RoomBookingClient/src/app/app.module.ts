@@ -18,6 +18,7 @@ import {HttpClientModule} from "@angular/common/http";
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmDialogService} from "./confirm-dialog/confirm-dialog-service";
+import { EditBookingLoadComponent } from './calendar/edit-booking-load/edit-booking-load.component';
 
 const routes :Routes = [
   {path: 'admin/users', component :UsersComponent},
@@ -42,7 +43,8 @@ const routes :Routes = [
     UserEditComponent,
     RoomEditComponent,
     EditBookingComponent,
-    ConfirmDialogComponent
+    ConfirmDialogComponent,
+    EditBookingLoadComponent
   ],
   imports: [
     BrowserModule,

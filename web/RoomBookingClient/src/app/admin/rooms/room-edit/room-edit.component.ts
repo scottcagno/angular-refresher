@@ -26,7 +26,7 @@ export class RoomEditComponent implements OnInit, OnDestroy {
 
   roomFormReset !: Subscription;
 
-  message = "Plase wait..."
+  message = "Please wait..."
 
   constructor(private formBuilder: FormBuilder,
               private dataService: DataService,
