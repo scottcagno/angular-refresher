@@ -14,6 +14,8 @@ export class CalendarComponent implements OnInit {
 
   bookings !: Array<Booking>;
   selectedDate !: string;
+  dataLoaded = false;
+  message = '';
 
   constructor(private dataService: DataService,
               private router :Router,
@@ -21,25 +23,44 @@ export class CalendarComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  this.loadData();
+  }
+
+  loadData(): void  {
+    this.message = 'Loading data....'
     this.dataService.getUser(2).subscribe(
       next => {
         console.log(next);
         console.log(typeof next);
         console.log(next.getRole());
+      },
+      error => {
+        this.message = 'Sorry -- error loading user data'
       }
     );
     this.route.queryParams.subscribe(
       params =>{
-      this.selectedDate = params['date'];
-      if (!this.selectedDate) {
-        this.selectedDate = formatDate(new Date(), 'yyyy-MM-dd', 'en_us');
-      }
-      this.dataService.getBookings(this.selectedDate).subscribe(
-        next => {
-          this.bookings = next;
+        this.selectedDate = params['date'];
+        if (!this.selectedDate) {
+          this.selectedDate = formatDate(new Date(), 'yyyy-MM-dd', 'en_us');
         }
-      );
-    });
+        this.getBookings(this.selectedDate);
+      });
+  }
+
+  getBookings(date :string) {
+    this.message = 'Loading data....'
+    this.dataService.getBookings(date).subscribe(
+      next => {
+        this.bookings = next;
+        this.dataLoaded = true;
+        this.message = '';
+      },
+      error => {
+        this.dataLoaded = false;
+        this.message = 'Sorry -- error loading booking data';
+      }
+    );
   }
 
   editBooking(id: number) {
@@ -51,7 +72,16 @@ export class CalendarComponent implements OnInit {
   }
 
   deleteBooking(id :number) {
-    this.dataService.deleteBooking(id).subscribe();
+    this.message = 'Deleting booking, please wait...';
+    this.dataService.deleteBooking(id).subscribe(
+      next => {
+        this.message = '';
+        this.loadData();
+      },
+      error => {
+        this.message = 'Sorry -- there was a problem deleting the item';
+      },
+    );
   }
 
   dateChanged() {

@@ -1,60 +1,66 @@
 <h2>Booking System</h2>
 <div class="row pb-3">
   <div class="col">
-    <span class="lead">The following meetings are taking place on: </span>
+    <span class="lead">The following meetings are taking place on: <strong>{{selectedDate}}</strong></span>
   </div>
   <div class="col-3 justify-content-end">
     <input type="date" class="form-control" [(ngModel)]="selectedDate" name="selectedDate" (change)="dateChanged()">
   </div>
 </div>
 
-<h3 class="mt-5" *ngIf="bookings.length === 0">
-  There are no meetings currently scheduled for {{ selectedDate | date: 'EEE, MM-dd-yyyy' }}.
-</h3>
+<div class="card card-body bg-warning mb-3" *ngIf="message">{{ message }}</div>
 
-<div class="row" *ngIf="bookings.length > 0">
-  <div class="container">
-    <div class="pb-3">
-      <button class="btn btn-outline-primary" (click)="addBooking()">New Booking <i class="fa fa-plus"></i></button>
-    </div>
-    <!-- start list group -->
-    <div class="list-group">
-      <div class="list-group-item" *ngFor="let booking of bookings">
-        <div class="">
-          <div class="row g-0">
-            <div class="col-3 p-1 text-center">
-              <div class="card-body">
-                <h5>{{ booking.room.name }} {{ booking.layout }}</h5>
-                <h5>{{ booking.getDateAsDate() | date:'EEE, MMM d, y' }}</h5>
-                <p class="text-muted"> Booked by {{ booking.user.name }}</p>
+<div *ngIf="dataLoaded">
+  <h3 class="mt-5" *ngIf="bookings.length === 0">
+    There are no meetings currently scheduled for {{ selectedDate | date: 'EEE, MM-dd-yyyy' }}.
+  </h3>
+
+  <div class="row" *ngIf="bookings.length > 0">
+    <div class="container">
+      <div class="pb-3">
+        <button class="btn btn-outline-primary" (click)="addBooking()">New Booking <i class="fa fa-plus"></i></button>
+      </div>
+      <!-- start list group -->
+      <div class="list-group">
+        <div class="list-group-item" *ngFor="let booking of bookings">
+          <div class="">
+            <div class="row g-0">
+              <div class="col-3 p-1 text-center">
+                <div class="card-body">
+                  <h5>{{ booking.room.name }} {{ booking.layout }}</h5>
+                  <h5>{{ booking.getDateAsDate() | date:'EEE, MMM d, y' }}</h5>
+                  <p class="text-muted"> Booked by {{ booking.user.name }}</p>
+                </div>
               </div>
-            </div>
-            <div class="col-6">
-              <div class="card-body">
-                <h5 class="card-title pb-1">{{ booking.title }}</h5>
-                <p class="card-text">
-                  <i class="fa fa-calendar"></i> {{ booking.getDateAsDate() | date: 'EEEE'}} <br>
-                  <i class="fa fa-clock-o"></i> {{ booking.startTime }} - {{ booking.endTime }} <br>
-                  <i class="fa fa-location-arrow"></i> {{ booking.room.name }} {{ booking.layout }} <br>
-                  <i class="fa fa-users"></i> {{ booking.participants }} participants <br>
-                </p>
+              <div class="col-6">
+                <div class="card-body">
+                  <h5 class="card-title pb-1">{{ booking.title }}</h5>
+                  <p class="card-text">
+                    <i class="fa fa-calendar"></i> {{ booking.getDateAsDate() | date: 'EEEE'}} <br>
+                    <i class="fa fa-clock-o"></i> {{ booking.startTime }} - {{ booking.endTime }} <br>
+                    <i class="fa fa-location-arrow"></i> {{ booking.room.name }} {{ booking.layout }} <br>
+                    <i class="fa fa-users"></i> {{ booking.participants }} participants <br>
+                  </p>
+                </div>
               </div>
-            </div>
-            <div class="col-3">
-              <div class="card-body">
-                <div class="d-grid gap-3 d-inline-block justify-content-end">
-                  <button class="btn btn-outline-warning" type="button" (click)="editBooking(booking.id)">Amend</button>
-                  <button class="btn btn-outline-danger" type="button" (click)="deleteBooking(booking.id)">Cancel</button>
+              <div class="col-3">
+                <div class="card-body">
+                  <div class="d-grid gap-3 d-inline-block justify-content-end">
+                    <button class="btn btn-outline-warning" type="button" (click)="editBooking(booking.id)">Edit</button>
+                    <button class="btn btn-outline-danger" type="button" (click)="deleteBooking(booking.id)">Delete</button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <!-- end list group -->
     </div>
-    <!-- end list group -->
   </div>
 </div>
+
+
 
 <!--
 <div class="card mb-3">

@@ -39,9 +39,9 @@ func (b *BookingRepository) init() {
 		Title:        "Conference call with CEO",
 		User:         *userData[1],
 		Room:         *roomData[0],
-		Date:         time.Now().String(),
-		StartTime:    time.Now().Add(30 * time.Minute),
-		EndTime:      time.Now().Add(3 * time.Hour),
+		Date:         GetDate(Today, 0),
+		StartTime:    time.Now().Add(0 * time.Minute),
+		EndTime:      time.Now().Add(30 * time.Minute),
 		Participants: 4,
 	}
 	booking2 := &Booking{
@@ -49,17 +49,31 @@ func (b *BookingRepository) init() {
 		Title:        "Some important meeting",
 		User:         *userData[0],
 		Room:         *roomData[1],
-		Date:         time.Now().Add(29 * time.Hour).String(),
-		StartTime:    time.Now().Add(30 * time.Hour),
-		EndTime:      time.Now().Add(31 * time.Hour),
+		Date:         GetDate(Today, 0),
+		StartTime:    time.Now().Add(45 * time.Minute),
+		EndTime:      time.Now().Add(90 * time.Minute),
 		Participants: 7,
 	}
-	b.nextID = 3
+	booking3 := &Booking{
+		ID:           3,
+		Title:        "The most important meeting",
+		User:         *userData[0],
+		Room:         *roomData[1],
+		Date:         GetDate(Add, 1),
+		StartTime:    time.Now().Add(24 * time.Hour),
+		EndTime:      time.Now().Add(25 * time.Hour),
+		Participants: 2,
+	}
+	b.nextID = 4
 	err = b.Repository.Insert(booking1.ID, booking1)
 	if err != nil {
 		panic(err)
 	}
 	err = b.Repository.Insert(booking2.ID, booking2)
+	if err != nil {
+		panic(err)
+	}
+	err = b.Repository.Insert(booking3.ID, booking3)
 	if err != nil {
 		panic(err)
 	}

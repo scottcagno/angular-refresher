@@ -23,18 +23,12 @@ func (c *Controller) Get(w http.ResponseWriter, r *http.Request) {
 		api.WriteJSON(w, http.StatusOK, users)
 		return
 	}
-	// handle get all by date
-	// date, err := time.Parse("2006-01-02", param)
-	// if err != nil {
-	// 	api.WriteJSON(w, http.StatusExpectationFailed, err)
-	// 	return
-	// }
-	user, err := c.Repository.Find(func(b *Booking) bool { return b.Date == param })
-	if err != nil || len(user) != 1 {
+	bookings, err := c.Repository.Find(func(b *Booking) bool { return b.Date == param })
+	if err != nil || len(bookings) < 1 {
 		api.WriteJSON(w, http.StatusExpectationFailed, err)
 		return
 	}
-	api.WriteJSON(w, http.StatusOK, user)
+	api.WriteJSON(w, http.StatusOK, bookings)
 	return
 }
 
