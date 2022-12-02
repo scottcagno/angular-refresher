@@ -15,6 +15,9 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import { RoomEditComponent } from './admin/rooms/room-edit/room-edit.component';
 import { EditBookingComponent } from './calendar/edit-booking/edit-booking.component';
 import {HttpClientModule} from "@angular/common/http";
+import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmDialogService} from "./confirm-dialog/confirm-dialog-service";
 
 const routes :Routes = [
   {path: 'admin/users', component :UsersComponent},
@@ -38,16 +41,18 @@ const routes :Routes = [
     UserDetailComponent,
     UserEditComponent,
     RoomEditComponent,
-    EditBookingComponent
+    EditBookingComponent,
+    ConfirmDialogComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    RouterModule.forRoot(routes)
+    RouterModule.forRoot(routes),
+    NgbModule,
   ],
-  providers: [],
+  providers: [ ConfirmDialogService ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

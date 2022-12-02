@@ -2,6 +2,8 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Room} from "../../../model/Room";
 import {Router} from "@angular/router";
 import {DataService} from "../../../data.service";
+import {ConfirmDialogService} from "../../../confirm-dialog/confirm-dialog-service";
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-room-detail',
@@ -18,7 +20,10 @@ export class RoomDetailComponent implements OnInit {
 
   message = '';
 
-  constructor(private router :Router, private dataService : DataService) { }
+  constructor(
+    private router :Router,
+    private dataService : DataService,
+    private modal : NgbModal) { }
 
   ngOnInit(): void {
   }
@@ -28,16 +33,19 @@ export class RoomDetailComponent implements OnInit {
   }
 
   deleteRoom() {
-    this.message = 'Removing room';
-    this.dataService.deleteRoom(this.room.id).subscribe(
-      next => {
-        this.dataChanged.emit();
-        this.router.navigate(['admin','rooms']);
-      },
-      error => {
-        this.message = 'Sorry -- this room cannot be deleted at this time.';
-      }
-    );
+    const result = confirm('Are you sure you wish to delete this room?');
+    if (result) {
+      this.message = 'Removing room';
+      this.dataService.deleteRoom(this.room.id).subscribe(
+        next => {
+          this.dataChanged.emit();
+          this.router.navigate(['admin','rooms']);
+        },
+        error => {
+          this.message = 'Sorry -- this room cannot be deleted at this time.';
+        }
+      );
+    }
   }
 
 }

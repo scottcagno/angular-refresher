@@ -28,17 +28,20 @@ export class UserDetailComponent implements OnInit {
   }
 
   deleteUser() {
-    this.message = 'deleting user...';
-    this.dataService.deleteUser(this.user.id).subscribe(
-      next => {
-        this.dataChangedEvent.emit();
-        this.router.navigate(['admin','users'] );
-        this.message = '';
-      },
-      error => {
-        this.message = 'Sorry, this user cannot be deleted at this time.';
-      }
-    );
+    const result = confirm('Are you sure you wish to delete this user?');
+    if (result) {
+      this.message = 'deleting user...';
+      this.dataService.deleteUser(this.user.id).subscribe(
+        next => {
+          this.dataChangedEvent.emit();
+          this.router.navigate(['admin','users'] );
+          this.message = '';
+        },
+        error => {
+          this.message = 'Sorry, this user cannot be deleted at this time.';
+        }
+      );
+    }
   }
 
   resetPassword() {
