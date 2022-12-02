@@ -4,7 +4,6 @@ import {Layout, Room} from "../../model/Room";
 import {DataService} from "../../data.service";
 import {User} from "../../model/User";
 import {ActivatedRoute, Router} from "@angular/router";
-import {EditBookingDataService} from "../../edit-booking-data.service";
 import {map} from "rxjs";
 
 @Component({
@@ -30,22 +29,27 @@ export class EditBookingComponent implements OnInit {
 
   ngOnInit(): void {
 
-    const id = this.route.snapshot.queryParams['id'];
+    this.rooms = this.route.snapshot.data['rooms']
+    this.users = this.route.snapshot.data['users']
+
+    const id = this.route.snapshot.queryParams['id'] as number;
     if (id) {
       this.dataService.getBooking(+id)
         .pipe(
           map(booking => {
             booking.room = this.rooms.find(room => room.id === booking.room.id) as Room;
             booking.user = this.users.find(user => user.id === booking.user.id) as User;
+           this.dataLoaded = true;
+           booking.id = id;
             return booking;
           })
         )
         .subscribe(
         next => {
-          this.booking = next as Booking;
+          this.booking = next;
           this.dataLoaded = true;
           this.message = '';
-        }
+        },
       );
     } else {
       this.booking = new Booking({});

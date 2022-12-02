@@ -8,8 +8,8 @@ export class Room {
   capacities!: Array<LayoutCapacity>;
 
   constructor(id?: number, name?: string, location?: string) {
-    if (id) { this.id = id }
-    if (name) { this.name = name }
+    if (id) { this.id = id as number }
+    if (name) { this.name = name as string }
     if (location) { this.location = location }
     this.capacities = new Array<LayoutCapacity>();
   }
@@ -19,7 +19,7 @@ export class Room {
   }
 
   static fromHttp(data: Room) :Room {
-    const newRoom = new Room(data.id, data.name, data.location);
+    const newRoom = new Room(data.id as number, data.name, data.location);
     for (const lc of data.capacities) {
       newRoom.capacities.push(LayoutCapacity.fromHttp(lc));
     }

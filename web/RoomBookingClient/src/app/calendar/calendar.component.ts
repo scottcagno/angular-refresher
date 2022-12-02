@@ -80,9 +80,9 @@ export class CalendarComponent implements OnInit {
           this.message = '';
           this.loadData();
         },
-        error => {
-          this.message = 'Sorry -- there was a problem deleting the item';
-        },
+        // error => {
+        //   this.message = 'Sorry -- there was a problem deleting the item';
+        // },
       );
     }
   }

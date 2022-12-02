@@ -12,6 +12,6 @@ export class PrefetchUsersService implements Resolve<Observable<Array<User>>> {
   constructor(private dataService: DataService) { }
 
   resolve() {
-    return this.dataService.getUsers();
+    return this.dataService.getUsers() ;
   }
 }

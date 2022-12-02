@@ -17,7 +17,7 @@ export class Booking {
 
   constructor(data:{id?:number, room?:Room, user?:User, layout?:Layout, title?:string, date?:string,
     startTime?:string, endTime?:string, participants?:number}) {
-    if (data.id) { this.id = data.id }
+    if (data.id) { this.id = data.id as number }
     if (data.room) { this.room = data.room }
     if (data.user) { this.user = data.user }
     if (data.layout) { this.layout = data.layout }
@@ -30,7 +30,7 @@ export class Booking {
 
   static fromHttp(b: Booking) :Booking {
     return new Booking({
-      id: b.id,
+      id: b.id as number,
       room : Room.fromHttp(b.room) as Room,
       user : User.fromHttp(b.user) as User,
       layout: b.layout,

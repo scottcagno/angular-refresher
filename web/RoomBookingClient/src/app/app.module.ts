@@ -16,16 +16,18 @@ import { RoomEditComponent } from './admin/rooms/room-edit/room-edit.component';
 import { EditBookingComponent } from './calendar/edit-booking/edit-booking.component';
 import {HttpClientModule} from "@angular/common/http";
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import {ConfirmDialogService} from "./confirm-dialog/confirm-dialog-service";
-import { EditBookingLoadComponent } from './calendar/edit-booking-load/edit-booking-load.component';
+import {PrefetchRoomsService} from "./prefetch-rooms.service";
+import {PrefetchUsersService} from "./prefetch-users.service";
 
 const routes :Routes = [
   {path: 'admin/users', component :UsersComponent},
   {path: 'admin/rooms', component :RoomsComponent},
   {path: '', component :CalendarComponent},
   {path: 'add-booking', component:EditBookingComponent},
-  {path: 'edit-booking', component:EditBookingComponent},
+  {path: 'edit-booking', component:EditBookingComponent, resolve:{
+    rooms:PrefetchRoomsService,
+    users:PrefetchUsersService,
+   }},
   {path: '404', component :PageNotFoundComponent},
   {path: '**', redirectTo: '/404'}
 ];
@@ -44,7 +46,6 @@ const routes :Routes = [
     RoomEditComponent,
     EditBookingComponent,
     ConfirmDialogComponent,
-    EditBookingLoadComponent
   ],
   imports: [
     BrowserModule,
@@ -52,9 +53,8 @@ const routes :Routes = [
     ReactiveFormsModule,
     HttpClientModule,
     RouterModule.forRoot(routes),
-    NgbModule,
   ],
-  providers: [ ConfirmDialogService ],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
