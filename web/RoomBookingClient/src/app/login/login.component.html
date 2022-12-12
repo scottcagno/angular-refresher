@@ -1,0 +1,26 @@
+<div class="login col-4 offset-4">
+  <legend>Login</legend>
+  <hr>
+  <div class="card card-body bg-warning mb-3" *ngIf="message">{{ message }}</div>
+  <form #userFrom="ngForm" autocomplete="off" readonly="false" novalidate class="row g-3">
+    <div class="mb-3 col-12">
+      <label for="username" class="form-label">Username</label>
+      <input id="username" type="text" class="form-control" placeholder="Username" name="username"
+             required
+             [(ngModel)]="username">
+    </div>
+    <div class="mb-3 col-12">
+      <label for="password" class="form-label">Password</label>
+      <input id="password" type="password" class="form-control" placeholder="Password"  name="password"
+             required
+             [(ngModel)]="password">
+    </div>
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <button type="button" class="btn btn-outline-secondary me-md-2"
+              (click)="onCancel()">Cancel</button>
+      <button type="button" class="btn btn-outline-success me-md-2"
+              (click)="onSubmit()">Login</button>
+    </div>
+  </form>
+</div>

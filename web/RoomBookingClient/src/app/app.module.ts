@@ -18,19 +18,23 @@ import {HttpClientModule} from "@angular/common/http";
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
 import {PrefetchRoomsService} from "./prefetch-rooms.service";
 import {PrefetchUsersService} from "./prefetch-users.service";
+import { LoginComponent } from './login/login.component';
+import {AuthRouteGuardService} from "./auth-route-guard.service";
 
 const routes :Routes = [
-  {path: 'admin/users', component :UsersComponent},
-  {path: 'admin/rooms', component :RoomsComponent},
+  {path: 'admin/users', component :UsersComponent, canActivate : [AuthRouteGuardService]},
+  {path: 'admin/rooms', component :RoomsComponent, canActivate : [AuthRouteGuardService]},
   {path: '', component :CalendarComponent},
   {path: 'add-booking', component:EditBookingComponent, resolve:{
       rooms:PrefetchRoomsService,
       users:PrefetchUsersService,
-    }},
+    }, canActivate : [AuthRouteGuardService]},
   {path: 'edit-booking', component:EditBookingComponent, resolve:{
     rooms:PrefetchRoomsService,
     users:PrefetchUsersService,
-   }},
+   },canActivate : [AuthRouteGuardService]},
+  {path: 'login', component: LoginComponent},
+  {path: 'logout', component: LoginComponent},
   {path: '404', component :PageNotFoundComponent},
   {path: '**', redirectTo: '/404'}
 ];
@@ -49,6 +53,7 @@ const routes :Routes = [
     RoomEditComponent,
     EditBookingComponent,
     ConfirmDialogComponent,
+    LoginComponent,
   ],
   imports: [
     BrowserModule,
