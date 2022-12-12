@@ -42,12 +42,13 @@ func (c *Controller) Get(w http.ResponseWriter, r *http.Request) {
 			api.WriteJSON(w, http.StatusExpectationFailed, err)
 			return
 		}
-		bookings, err := c.Repository.Find(func(b *Booking) bool { return b.ID == id })
-		if err != nil || len(bookings) != 1 {
+		booking, err := c.Repository.FindOne(func(b *Booking) bool { return b.ID == id })
+		if err != nil {
 			api.WriteJSON(w, http.StatusExpectationFailed, err)
 			return
 		}
-		api.WriteJSON(w, http.StatusOK, bookings)
+		// WE ONLY WANT TO RETURN ONE ITEM
+		api.WriteJSON(w, http.StatusOK, booking)
 		return
 	}
 	return

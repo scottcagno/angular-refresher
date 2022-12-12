@@ -88,10 +88,8 @@ export class DataService {
   getBooking(id: number) : Observable<Booking> {
     return this.http.get<Booking>(Booking.endpoint(id))
       .pipe(
-        map( data => {
-          return Booking.fromHttp(data) as Booking
-        } )
-      );
+        map( data => Booking.fromHttp(data))
+      )
   }
 
   getBookings(date: string) : Observable<Array<Booking>> {

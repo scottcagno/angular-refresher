@@ -4,7 +4,7 @@ import {Layout, Room} from "../../model/Room";
 import {DataService} from "../../data.service";
 import {User} from "../../model/User";
 import {ActivatedRoute, Router} from "@angular/router";
-import {map} from "rxjs";
+import {map} from "rxjs/operators";
 
 @Component({
   selector: 'app-edit-booking',
@@ -13,14 +13,13 @@ import {map} from "rxjs";
 })
 export class EditBookingComponent implements OnInit {
 
-
   booking !: Booking;
   rooms !:Array<Room>;
   layouts = Object.keys(Layout);
   layoutEnum = Object(Layout);
   users !:Array<User>;
   dataLoaded = false;
-  message = 'Please waitzzzzzzzzzzzzzz...';
+  message = 'Please wait...';
 
 
   constructor(private dataService :DataService,
@@ -29,31 +28,30 @@ export class EditBookingComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.rooms = this.route.snapshot.data['rooms']
-    this.users = this.route.snapshot.data['users']
+    this.rooms = this.route.snapshot.data['rooms'];
+    this.users = this.route.snapshot.data['users'];
 
-    const id = this.route.snapshot.queryParams['id'] as number;
+    const id = this.route.snapshot.queryParams['id'];
     if (id) {
       this.dataService.getBooking(+id)
         .pipe(
           map(booking => {
-            booking.room = this.rooms.find(room => room.id === booking.room.id) as Room;
-            booking.user = this.users.find(user => user.id === booking.user.id) as User;
-           this.dataLoaded = true;
-           booking.id = id;
+            if (booking.room === undefined) { return }
+            if (booking.user === undefined) { return }
+            booking.user = this.users.find(user => user.id === booking['user']['id']) as User;
+            booking.room = this.rooms.find(room => room.id === booking['room']['id']) as Room;
             return booking;
           })
         )
         .subscribe(
         next => {
-          console.log(this.booking, next);
-          this.booking = next;
+          this.booking = next as Booking;
           this.dataLoaded = true;
           this.message = '';
-        },
+        }
       );
     } else {
-      this.booking = new Booking({});
+      this.booking = new Booking();
       this.dataLoaded = true;
       this.message = '';
     }

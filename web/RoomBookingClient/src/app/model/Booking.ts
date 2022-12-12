@@ -15,31 +15,45 @@ export class Booking {
   endTime !: string;
   participants !: number;
 
-  constructor(data:{id?:number, room?:Room, user?:User, layout?:Layout, title?:string, date?:string,
+  // constructor() {
+  //   this.id = -1;
+  //   this.room = new Room();
+  //   this.user = new User();
+  //   this.layout = Layout.EMPTY;
+  //   this.date = '';
+  //   this.startTime = '';
+  //   this.endTime = '';
+  //   this.participants = -1;
+  // }
+
+  constructor(data?:{id?:number, room?:Room, user?:User, layout?:Layout, title?:string, date?:string,
     startTime?:string, endTime?:string, participants?:number}) {
-    if (data.id) { this.id = data.id as number }
-    if (data.room) { this.room = data.room }
-    if (data.user) { this.user = data.user }
-    if (data.layout) { this.layout = data.layout }
-    if (data.title) { this.title = data.title }
-    if (data.date) { this.date = data.date }
-    if (data.startTime) { this.startTime = data.startTime }
-    if (data.endTime) { this.endTime = data.endTime }
-    if (data.participants) { this.participants = data.participants }
+    if (data) {
+      if (data.id) { this.id = data.id as number }
+      if (data.room) { this.room = data.room as Room }
+      if (data.user) { this.user = data.user as User }
+      if (data.layout) { this.layout = data.layout as Layout }
+      if (data.title) { this.title = data.title }
+      if (data.date) { this.date = data.date }
+      if (data.startTime) { this.startTime = data.startTime }
+      if (data.endTime) { this.endTime = data.endTime }
+      if (data.participants) { this.participants = data.participants }
+    }
   }
 
   static fromHttp(b: Booking) :Booking {
-    return new Booking({
-      id: b.id as number,
-      room : Room.fromHttp(b.room) as Room,
-      user : User.fromHttp(b.user) as User,
-      layout: b.layout,
-      title: b.title,
-      date : b.date,
-      startTime: b.startTime,
-      endTime: b.endTime,
-      participants: b.participants,
-    }) as Booking;
+    return new Booking(b) as Booking;
+    // booking.
+    //   id: b.id as number,
+    //   room : Room.fromHttp(b.room) as Room,
+    //   user : User.fromHttp(b.user) as User,
+    //   layout: b.layout,
+    //   title: b.title,
+    //   date : b.date,
+    //   startTime: b.startTime,
+    //   endTime: b.endTime,
+    //   participants: b.participants,
+    // }) as Booking;
   }
 
   onCancel() {}

@@ -27,29 +27,26 @@ export class CalendarComponent implements OnInit {
   }
 
   loadData(): void  {
-    this.message = 'Loading data....'
-    // this.dataService.getUser(2).subscribe(
-    //   next => {
-    //     console.log(next);
-    //     console.log(typeof next);
-    //     console.log(next.getRole());
-    //   },
-    //   error => {
-    //     this.message = 'Sorry -- error loading user data'
-    //   }
-    // );
+    this.message = 'Loading data...'
     this.route.queryParams.subscribe(
       params =>{
         this.selectedDate = params['date'];
         if (!this.selectedDate) {
           this.selectedDate = formatDate(new Date(), 'yyyy-MM-dd', 'en_us');
         }
-        this.getBookings(this.selectedDate);
+        this.dataService.getBookings(this.selectedDate).subscribe(
+          next => {
+            this.bookings = next;
+            this.dataLoaded = true;
+            this.message = '';
+          },
+          error => this.message = 'Sorry -- the data could not be loaded.'
+        );
       });
   }
 
   getBookings(date :string) {
-    this.message = 'Loading data....'
+    this.message = 'Getting booking list...'
     this.dataService.getBookings(date).subscribe(
       next => {
         this.bookings = next;
@@ -80,9 +77,9 @@ export class CalendarComponent implements OnInit {
           this.message = '';
           this.loadData();
         },
-        // error => {
-        //   this.message = 'Sorry -- there was a problem deleting the item';
-        // },
+        error => {
+          this.message = 'Sorry -- there was a problem deleting the item';
+        },
       );
     }
   }

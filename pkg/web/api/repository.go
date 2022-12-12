@@ -23,6 +23,13 @@ type Repository[T any, K comparable] interface {
 	// entries.
 	Find(query QueryFunc[T]) ([]T, error)
 
+	// FindOne provides the user with an interface for
+	// locating, retrieving or viewing one entity. It
+	// guarantees that only one entry is returned. If
+	// more than one entry is found, it returns the first
+	// one matched.
+	FindOne(query QueryFunc[T]) (T, error)
+
 	// Exec provides the user with an interface for
 	// locating and executing a function on the items matching
 	// the query criteria.
@@ -73,6 +80,27 @@ func (repo *MemoryRepository[T, K]) Find(query QueryFunc[T]) ([]T, error) {
 	}
 	if len(res) == 0 {
 		return nil, errors.New("error: query did not match anything")
+	}
+	return res, nil
+}
+
+func (repo *MemoryRepository[T, K]) FindOne(query QueryFunc[T]) (T, error) {
+	repo.lock.Lock()
+	defer repo.lock.Unlock()
+	var res T
+	if len(repo.data) < 1 {
+		return res, errors.New("error: cannot find anything because there is no data")
+	}
+	var foundMatch bool
+	for k, t := range repo.data {
+		if query(t) {
+			res = repo.data[k]
+			foundMatch = true
+			break
+		}
+	}
+	if !foundMatch {
+		return res, errors.New("error: query did not match anything")
 	}
 	return res, nil
 }
