@@ -59,6 +59,8 @@ var defaultCORSConfig = &CORSConfig{
 	MaxAge:           0,
 }
 
+var DefaultCORSConfig = defaultCORSConfig
+
 func CORSHandler(c *CORSConfig) http.Handler {
 	if c == nil {
 		c = defaultCORSConfig

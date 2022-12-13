@@ -16,7 +16,20 @@ func Options(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "[OPTIONS] called")
 }
 
-func WithLogging2(logger *log.Logger, next http.Handler) http.Handler {
+// func _Secure(conf *BasicAuthConfig, next http.Handler) http.Handler {
+// 	fn := func(w http.ResponseWriter, r *http.Request) {
+// 		_, _, isAuthenticated := r.BasicAuth()
+// 		if isAuthenticated {
+// 			next.ServeHTTP(w, r)
+// 			return
+// 		}
+// 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+// 		return
+// 	}
+// 	return http.HandlerFunc(fn)
+// }
+
+func _WithLogging2(logger *log.Logger, next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		next.ServeHTTP(w, r)
 		logger.Printf("HttpReq <- [method=%q, path=%q, params=%v]\n", r.Method, r.RequestURI, r.URL.Query())

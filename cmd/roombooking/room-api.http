@@ -1,3 +1,20 @@
+// Test validation (VALID ONE)
+GET http://localhost:8080/api/validate
+Authorization: Basic YWRtaW46c2VjcmV0
+
+###
+
+// Test validation (INVALID ONE)
+GET http://localhost:8080/api/validate
+Authorization: Basic YWRtaW46c2Vzzzzz
+
+###
+
+// Test validation (NO VALIDATION PROVIDED)
+GET http://localhost:8080/api/validate
+
+###
+
 // Get all of the rooms
 GET http://localhost:8080/api/rooms
 Accept: application/json

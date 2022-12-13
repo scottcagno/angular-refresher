@@ -5,12 +5,18 @@ import {map, Observable, of} from "rxjs";
 import {Booking} from "./model/Booking";
 import {formatDate} from "@angular/common";
 import {environment} from "../environments/environment";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpHeaders} from "@angular/common/http";
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
+
+  validateUser(username : string, password : string) :Observable<string> {
+    const headers = new HttpHeaders();
+    headers.append('Authorization','Basic '+`${username}:${password}`.toString());
+    return this.http.get<string>(environment.restUrl + '/api/basicAuth/validate', {headers: headers});
+  }
 
   /*
    * Room methods

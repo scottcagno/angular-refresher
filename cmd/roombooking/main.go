@@ -19,17 +19,28 @@ func main() {
 	ds := services.NewDataService()
 
 	// initialize rooms controller (and inject the data service into it)
-	roomCont := &rooms.Controller{RoomRepository: ds.RoomRepo}
+	roomCont := &rooms.Controller{RoomRepository: ds.RoomRepo, BasicAuth: ds.BasicAuth}
 
 	// initialize users controller
-	userCont := &users.Controller{UserRepository: ds.UserRepo}
+	userCont := &users.Controller{UserRepository: ds.UserRepo, BasicAuth: ds.BasicAuth}
 
 	// initialize booking controller
-	bookingCont := &booking.Controller{BookingRepository: ds.BookingRepo}
+	bookingCont := &booking.Controller{BookingRepository: ds.BookingRepo, BasicAuth: ds.BasicAuth}
 
 	// initialize our cors handler
-	cors := middleware.CORSHandler(
-		&middleware.CORSConfig{
+	// cors := middleware.CORSHandler(
+	// 	&middleware.CORSConfig{
+	// 		AllowOrigins:     "http://localhost:4200/api/**",
+	// 		AllowMethods:     "GET,POST,PUT,DELETE",
+	// 		AllowHeaders:     "",
+	// 		AllowCredentials: false,
+	// 		ExposeHeaders:    "",
+	// 		MaxAge:           int(time.Duration(12 * time.Hour).Seconds()),
+	// 	},
+	// )
+
+	apiConf := &api.APIConfig{
+		CORS: &middleware.CORSConfig{
 			AllowOrigins:     "http://localhost:4200/api/**",
 			AllowMethods:     "GET,POST,PUT,DELETE",
 			AllowHeaders:     "",
@@ -37,10 +48,11 @@ func main() {
 			ExposeHeaders:    "",
 			MaxAge:           int(time.Duration(12 * time.Hour).Seconds()),
 		},
-	)
+		Auth: map[string]string{"admin": "secret"},
+	}
 
 	// initialize new rest api server
-	restAPI := api.NewAPI("/api/", cors, nil, nil)
+	restAPI := api.NewAPI("/api/", apiConf)
 
 	// register controllers with api
 	restAPI.Register("rooms", roomCont)

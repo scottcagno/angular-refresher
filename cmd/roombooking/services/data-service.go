@@ -14,6 +14,7 @@ type DataService struct {
 	RoomRepo    *rooms.RoomRepository
 	UserRepo    *users.UserRepository
 	BookingRepo *booking.BookingRepository
+	BasicAuth   map[string]string
 }
 
 var DataServiceInstance *DataService
@@ -31,6 +32,9 @@ func initDataServiceInstance() *DataService {
 	ds := &DataService{
 		RoomRepo: rooms.NewRoomRepository(),
 		UserRepo: users.NewUserRepository(),
+		BasicAuth: map[string]string{
+			"admin": "secret",
+		},
 	}
 	ds.BookingRepo = booking.NewBookingRepository(ds.UserRepo, ds.RoomRepo)
 	return ds

@@ -63,4 +63,5 @@ type ResourceV1 interface {
 // by automatically integrating with the API in a secure fashion, expecting
 // secure tokens to be exchanged before being able to process the request.
 type SecureResource interface {
+	CheckAuth(username, password string) http.HandlerFunc
 }
