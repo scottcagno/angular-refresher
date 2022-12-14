@@ -14,8 +14,11 @@ export class DataService {
 
   validateUser(username : string, password : string) :Observable<string> {
     const headers = new HttpHeaders();
-    headers.append('Authorization','Basic '+`${username}:${password}`.toString());
-    return this.http.get<string>(environment.restUrl + '/api/basicAuth/validate', {headers: headers});
+    console.log('got creds: ' + username + ', ' + password );
+    const creds = btoa(`${username}:${password}`)
+    console.log('---> ' + creds)
+    headers.append('Authorization','Basic '+creds);
+    return this.http.get<string>(environment.restUrl + '/api/validate', {headers: headers});
   }
 
   /*

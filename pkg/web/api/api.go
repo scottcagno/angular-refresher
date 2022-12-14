@@ -114,6 +114,7 @@ func (api *API) BasicAuthHandler() http.Handler {
 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
 				return
 			}
+			http.Redirect(w, r, "/", http.StatusOK)
 		},
 	)
 }
@@ -153,7 +154,11 @@ func (api *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	rh, pat := api.mux.Handler(r)
 	// do something with the pattern if we need to
 	_ = pat
+	// if strings.HasSuffix(pat, "/validate") {
+	// 	rh.ServeHTTP(w, r)
+	// }
 	// call the resource handler
+	fmt.Println(">>>", pat)
 	rh.ServeHTTP(w, r)
 }
 

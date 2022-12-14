@@ -42,7 +42,7 @@ func main() {
 	apiConf := &api.APIConfig{
 		CORS: &middleware.CORSConfig{
 			AllowOrigins:     "http://localhost:4200/api/**",
-			AllowMethods:     "GET,POST,PUT,DELETE",
+			AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
 			AllowHeaders:     "",
 			AllowCredentials: false,
 			ExposeHeaders:    "",
@@ -60,6 +60,11 @@ func main() {
 	restAPI.Register("bookings", bookingCont)
 	restAPI.RegisterCustom("users/resetPassword", userCont)
 
+	// certFile := "cmd/roombooking/cert/CA/CA.pem"
+	// keyFile := "cmd/roombooking/cert/CA/CA.key"
+
 	// serve the api
+	// log.Fatal(http.ListenAndServeTLS(":8080", certFile, keyFile, restAPI))
+
 	log.Fatal(http.ListenAndServe(":8080", restAPI))
 }
