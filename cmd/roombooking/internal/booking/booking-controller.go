@@ -1,7 +1,6 @@
 package booking
 
 import (
-	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -11,22 +10,22 @@ import (
 
 type Controller struct {
 	*BookingRepository
-	BasicAuth map[string]string
+	//BasicAuth *services.JWTService
 }
 
-func (c *Controller) CheckAuth(user, pass string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// check the username and password
-		storedPass, has := c.BasicAuth[user]
-		if !has || pass != storedPass {
-			// not authorized
-			api.WriteJSON(w, http.StatusExpectationFailed, errors.New(http.StatusText(http.StatusUnauthorized)))
-			return
-		}
-		api.WriteJSON(w, http.StatusOK, nil)
-		return
-	}
-}
+// func (c *Controller) CheckAuth(user, pass string) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		// check the username and password
+// 		storedPass, has := c.BasicAuth[user]
+// 		if !has || pass != storedPass {
+// 			// not authorized
+// 			api.WriteJSON(w, http.StatusExpectationFailed, errors.New(http.StatusText(http.StatusUnauthorized)))
+// 			return
+// 		}
+// 		api.WriteJSON(w, http.StatusOK, nil)
+// 		return
+// 	}
+// }
 
 func (c *Controller) Get(w http.ResponseWriter, r *http.Request) {
 	if api.HasParam(r, "date") {

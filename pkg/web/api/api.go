@@ -7,7 +7,9 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/scottcagno/angular-refresher/pkg/web"
 	"github.com/scottcagno/angular-refresher/pkg/web/api/middleware"
+	"github.com/scottcagno/angular-refresher/pkg/web/jwt"
 )
 
 type M = map[string]any
@@ -16,7 +18,7 @@ type APIConfig struct {
 	CORS   *middleware.CORSConfig
 	Muxer  *http.ServeMux
 	Logger *log.Logger
-	Auth   map[string]string
+	Auth   *jwt.JWTService
 }
 
 var defaultAPIConfig = &APIConfig{
@@ -37,7 +39,7 @@ func checkConf(c *APIConfig) *APIConfig {
 		c.Logger = log.New(os.Stderr, "[DEFAULT] ", log.LstdFlags)
 	}
 	if c.Auth == nil {
-		c.Auth = make(map[string]string)
+		c.Auth = jwt.NewJWTService()
 	}
 	return c
 }
@@ -48,6 +50,7 @@ type API struct {
 	cors     http.Handler
 	logger   *log.Logger
 	mux      *http.ServeMux
+	sessions *web.SessionStore
 	handlers []handler
 }
 
@@ -63,9 +66,15 @@ func NewAPI(base string, conf *APIConfig) *API {
 	api.mux = conf.Muxer
 	api.mux.Handle("/", http.RedirectHandler(api.base, http.StatusSeeOther))
 	api.mux.Handle(filepath.ToSlash(filepath.Join(api.base, "stats")), api.StatsHandler())
-	if conf.Auth != nil && len(conf.Auth) > 0 {
-		api.mux.Handle(filepath.ToSlash(filepath.Join(api.base, "validate")), api.BasicAuthHandler())
+	if conf.Auth != nil {
+		api.mux.Handle(filepath.ToSlash(filepath.Join(api.base, "validate")), api.AuthHandler())
 	}
+	// api.sessions = web.NewSessionStore(&web.SessionStoreConfig{
+	// 	SessionID: "go_sess_id",
+	// 	Domain:    "localhost",
+	// 	Timeout:   time.Duration(30) * time.Minute,
+	// })
+	api.sessions = web.NewSessionStore(nil)
 	api.handlers = make([]handler, 0)
 	return api
 }
@@ -86,7 +95,7 @@ func _NewAPI(base string, cors http.Handler, logger *log.Logger, mux *http.Serve
 	}
 	api.mux.Handle("/", http.RedirectHandler(api.base, http.StatusSeeOther))
 	api.mux.Handle(filepath.ToSlash(filepath.Join(api.base, "stats")), api.StatsHandler())
-	api.mux.Handle(filepath.ToSlash(filepath.Join(api.base, "validate")), api.BasicAuthHandler())
+	api.mux.Handle(filepath.ToSlash(filepath.Join(api.base, "validate")), api.AuthHandler())
 	return api
 }
 
@@ -98,26 +107,50 @@ func (api *API) StatsHandler() http.Handler {
 	)
 }
 
-func (api *API) BasicAuthHandler() http.Handler {
-	return http.HandlerFunc(
-		func(w http.ResponseWriter, r *http.Request) {
-			username, password, ok := r.BasicAuth()
-			log.Printf("running basic auth handler: u=%q, p=%q, ok=%v\n", username, password, ok)
-			if !ok {
-				w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
-				http.Error(w, "Unauthorized", http.StatusUnauthorized)
-				return
-			}
-			storedPass, hasPass := api.conf.Auth[username]
-			if !hasPass || storedPass != password {
-				w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
-				http.Error(w, "Unauthorized", http.StatusUnauthorized)
-				return
-			}
-			http.Redirect(w, r, "/", http.StatusOK)
-		},
-	)
+func (api *API) AuthHandler() http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		// get the user session
+		sess, exists := api.sessions.Get(r)
+		if !exists {
+			// do something here
+			WriteJSON(w, http.StatusUnauthorized, nil)
+			return
+		}
+		user, found := sess.GetUser()
+		if !found {
+			// do something here
+			WriteJSON(w, http.StatusUnauthorized, nil)
+			return
+		}
+
+		// generate JWT token
+		token := api.conf.Auth.GenerateSignedToken(user.Username, user.Role)
+		WriteJSON(w, http.StatusOK, map[string]string{"results": token})
+		return
+	}
+	return http.HandlerFunc(fn)
 }
+
+// func (api *API) _BasicAuthHandler() http.Handler {
+// 	return http.HandlerFunc(
+// 		func(w http.ResponseWriter, r *http.Request) {
+// 			username, password, ok := r.BasicAuth()
+// 			log.Printf("running basic auth handler: u=%q, p=%q, ok=%v\n", username, password, ok)
+// 			if !ok {
+// 				w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
+// 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+// 				return
+// 			}
+// 			storedPass, hasPass := api.conf.Auth[username]
+// 			if !hasPass || storedPass != password {
+// 				w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
+// 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+// 				return
+// 			}
+// 			http.Redirect(w, r, "/", http.StatusOK)
+// 		},
+// 	)
+// }
 
 func (api *API) Register(name string, re Resource) {
 	h := &handler{
@@ -158,7 +191,6 @@ func (api *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// 	rh.ServeHTTP(w, r)
 	// }
 	// call the resource handler
-	fmt.Println(">>>", pat)
 	rh.ServeHTTP(w, r)
 }
 

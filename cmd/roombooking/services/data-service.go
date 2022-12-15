@@ -8,19 +8,18 @@ import (
 	"github.com/scottcagno/angular-refresher/cmd/roombooking/internal/booking/users"
 )
 
-var once sync.Once
+var dataServiceOnce sync.Once
 
 type DataService struct {
 	RoomRepo    *rooms.RoomRepository
 	UserRepo    *users.UserRepository
 	BookingRepo *booking.BookingRepository
-	BasicAuth   map[string]string
 }
 
 var DataServiceInstance *DataService
 
 func NewDataService() *DataService {
-	once.Do(
+	dataServiceOnce.Do(
 		func() {
 			DataServiceInstance = initDataServiceInstance()
 		},
@@ -29,13 +28,10 @@ func NewDataService() *DataService {
 }
 
 func initDataServiceInstance() *DataService {
-	ds := &DataService{
+	service := &DataService{
 		RoomRepo: rooms.NewRoomRepository(),
 		UserRepo: users.NewUserRepository(),
-		BasicAuth: map[string]string{
-			"admin": "secret",
-		},
 	}
-	ds.BookingRepo = booking.NewBookingRepository(ds.UserRepo, ds.RoomRepo)
-	return ds
+	service.BookingRepo = booking.NewBookingRepository(service.UserRepo, service.RoomRepo)
+	return service
 }

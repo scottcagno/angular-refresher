@@ -19,13 +19,13 @@ func main() {
 	ds := services.NewDataService()
 
 	// initialize rooms controller (and inject the data service into it)
-	roomCont := &rooms.Controller{RoomRepository: ds.RoomRepo, BasicAuth: ds.BasicAuth}
+	roomCont := &rooms.Controller{RoomRepository: ds.RoomRepo}
 
 	// initialize users controller
-	userCont := &users.Controller{UserRepository: ds.UserRepo, BasicAuth: ds.BasicAuth}
+	userCont := &users.Controller{UserRepository: ds.UserRepo}
 
 	// initialize booking controller
-	bookingCont := &booking.Controller{BookingRepository: ds.BookingRepo, BasicAuth: ds.BasicAuth}
+	bookingCont := &booking.Controller{BookingRepository: ds.BookingRepo}
 
 	// initialize our cors handler
 	// cors := middleware.CORSHandler(
@@ -48,7 +48,7 @@ func main() {
 			ExposeHeaders:    "",
 			MaxAge:           int(time.Duration(12 * time.Hour).Seconds()),
 		},
-		Auth: map[string]string{"admin": "secret"},
+		Auth: nil,
 	}
 
 	// initialize new rest api server
