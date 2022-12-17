@@ -2,6 +2,7 @@ package jwt
 
 import (
 	"errors"
+	"fmt"
 )
 
 // Error constants
@@ -84,7 +85,7 @@ func (e *ValidationError) Is(err error) bool {
 	}
 
 	// Otherwise, we need to match using our error flags
-	switch err {
+	switch errors.Unwrap(err) {
 	case ErrTokenMalformed:
 		return e.Errors&ValidationErrorMalformed != 0
 	case ErrTokenUnverifiable:
@@ -108,4 +109,56 @@ func (e *ValidationError) Is(err error) bool {
 	}
 
 	return false
+}
+
+func (e *ValidationError) Name(err error) string {
+	// Check, if our inner error is a direct match
+	if errors.Is(errors.Unwrap(e), err) {
+		return fmt.Sprintf("%T", err)
+	}
+
+	// Otherwise, we need to match using our error flags
+	switch err {
+	case ErrTokenMalformed:
+		if e.Errors&ValidationErrorMalformed != 0 {
+			return fmt.Sprintf("%T", err)
+		}
+	case ErrTokenUnverifiable:
+		if e.Errors&ValidationErrorUnverifiable != 0 {
+			return fmt.Sprintf("%T", err)
+		}
+	case ErrTokenSignatureInvalid:
+		if e.Errors&ValidationErrorSignatureInvalid != 0 {
+			return fmt.Sprintf("%T", err)
+		}
+	case ErrTokenInvalidAudience:
+		if e.Errors&ValidationErrorAudience != 0 {
+			return fmt.Sprintf("%T", err)
+		}
+	case ErrTokenExpired:
+		if e.Errors&ValidationErrorExpired != 0 {
+			return fmt.Sprintf("%T", err)
+		}
+	case ErrTokenUsedBeforeIssued:
+		if e.Errors&ValidationErrorIssuedAt != 0 {
+			return fmt.Sprintf("%T", err)
+		}
+	case ErrTokenInvalidIssuer:
+		if e.Errors&ValidationErrorIssuer != 0 {
+			return fmt.Sprintf("%T", err)
+		}
+	case ErrTokenNotValidYet:
+		if e.Errors&ValidationErrorNotValidYet != 0 {
+			return fmt.Sprintf("%T", err)
+		}
+	case ErrTokenInvalidId:
+		if e.Errors&ValidationErrorId != 0 {
+			return fmt.Sprintf("%T", err)
+		}
+	case ErrTokenInvalidClaims:
+		if e.Errors&ValidationErrorClaimsInvalid != 0 {
+			return fmt.Sprintf("%T", err)
+		}
+	}
+	return fmt.Sprintf("%s", "<nil>")
 }

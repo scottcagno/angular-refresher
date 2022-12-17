@@ -55,10 +55,10 @@ func main() {
 	restAPI := api.NewAPI("/api/", apiConf)
 
 	// register controllers with api
-	restAPI.Register("rooms", roomCont)
-	restAPI.Register("users", userCont)
-	restAPI.Register("bookings", bookingCont)
-	restAPI.RegisterCustom("users/resetPassword", userCont)
+	restAPI.Register("rooms", roomCont, false)
+	restAPI.Register("users", userCont, true)
+	restAPI.Register("bookings", bookingCont, false)
+	restAPI.RegisterCustom("users/resetPassword", userCont, true)
 
 	// certFile := "cmd/roombooking/cert/CA/CA.pem"
 	// keyFile := "cmd/roombooking/cert/CA/CA.key"

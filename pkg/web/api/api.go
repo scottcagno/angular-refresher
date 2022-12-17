@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/scottcagno/angular-refresher/pkg/web"
 	"github.com/scottcagno/angular-refresher/pkg/web/api/middleware"
@@ -66,9 +67,11 @@ func NewAPI(base string, conf *APIConfig) *API {
 	api.mux = conf.Muxer
 	api.mux.Handle("/", http.RedirectHandler(api.base, http.StatusSeeOther))
 	api.mux.Handle(filepath.ToSlash(filepath.Join(api.base, "stats")), api.StatsHandler())
-	if conf.Auth != nil {
-		api.mux.Handle(filepath.ToSlash(filepath.Join(api.base, "validate")), api.AuthHandler())
-	}
+	api.mux.Handle(filepath.ToSlash(filepath.Join(api.base, "auth/basic")), api.BasicAuthHandler())
+	api.mux.Handle(filepath.ToSlash(filepath.Join(api.base, "auth/token")), api.AuthTokenHandler())
+	// if conf.Auth != nil {
+	// 	api.mux.Handle(filepath.ToSlash(filepath.Join(api.base, "validate")), api.AuthHandler())
+	// }
 	// api.sessions = web.NewSessionStore(&web.SessionStoreConfig{
 	// 	SessionID: "go_sess_id",
 	// 	Domain:    "localhost",
@@ -76,6 +79,7 @@ func NewAPI(base string, conf *APIConfig) *API {
 	// })
 	api.sessions = web.NewSessionStore(nil)
 	api.handlers = make([]handler, 0)
+	//api.logger.Println(api.conf.Auth.Keys())
 	return api
 }
 
@@ -95,7 +99,8 @@ func _NewAPI(base string, cors http.Handler, logger *log.Logger, mux *http.Serve
 	}
 	api.mux.Handle("/", http.RedirectHandler(api.base, http.StatusSeeOther))
 	api.mux.Handle(filepath.ToSlash(filepath.Join(api.base, "stats")), api.StatsHandler())
-	api.mux.Handle(filepath.ToSlash(filepath.Join(api.base, "validate")), api.AuthHandler())
+	api.mux.Handle(filepath.ToSlash(filepath.Join(api.base, "auth/basic")), api.BasicAuthHandler())
+	api.mux.Handle(filepath.ToSlash(filepath.Join(api.base, "auth/token")), api.AuthTokenHandler())
 	return api
 }
 
@@ -107,7 +112,7 @@ func (api *API) StatsHandler() http.Handler {
 	)
 }
 
-func (api *API) AuthHandler() http.Handler {
+func (api *API) AuthTokenHandler() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		// get the user session
 		sess, exists := api.sessions.Get(r)
@@ -122,7 +127,6 @@ func (api *API) AuthHandler() http.Handler {
 			WriteJSON(w, http.StatusUnauthorized, nil)
 			return
 		}
-
 		// generate JWT token
 		token := api.conf.Auth.GenerateSignedToken(user.Username, user.Role)
 		WriteJSON(w, http.StatusOK, map[string]string{"results": token})
@@ -131,43 +135,119 @@ func (api *API) AuthHandler() http.Handler {
 	return http.HandlerFunc(fn)
 }
 
-// func (api *API) _BasicAuthHandler() http.Handler {
-// 	return http.HandlerFunc(
-// 		func(w http.ResponseWriter, r *http.Request) {
-// 			username, password, ok := r.BasicAuth()
-// 			log.Printf("running basic auth handler: u=%q, p=%q, ok=%v\n", username, password, ok)
-// 			if !ok {
-// 				w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
-// 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
-// 				return
-// 			}
-// 			storedPass, hasPass := api.conf.Auth[username]
-// 			if !hasPass || storedPass != password {
-// 				w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
-// 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
-// 				return
-// 			}
-// 			http.Redirect(w, r, "/", http.StatusOK)
-// 		},
-// 	)
-// }
+func (api *API) BasicAuthHandler() http.Handler {
+	users := []struct {
+		Username string
+		Password string
+		Role     string
+	}{
+		{"admin", "secret", "ROLE_ADMIN"},
+		{"matt", "secret", "ROLE_ADMIN"},
+		{"jane", "secret", "ROLE_USER"},
+	}
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			username, password, hasBasicAuth := r.BasicAuth()
+			log.Printf("running basic auth handler: u=%q, p=%q, ok=%v\n", username, password, hasBasicAuth)
+			if !hasBasicAuth {
+				w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+			var foundMatch bool
+			for _, user := range users {
+				if user.Username == username && user.Password == password {
+					foundMatch = true
+					break
+				}
+			}
+			if !foundMatch {
+				w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+			http.Redirect(w, r, "/", http.StatusOK)
+		},
+	)
+}
 
-func (api *API) Register(name string, re Resource) {
+func (api *API) JWTAuthorizationFilter(next http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		// Check for a header key of Authorization and a value starting
+		// with Bearer
+		bearer := r.Header.Get("Authorization")
+		if bearer == "" || !strings.HasPrefix(bearer, "Bearer") {
+			// We did not find an Authorization Bearer <token>, so we return a 401 status
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
+		// Pass the Bearer token (jwtToken) to our authentication method to
+		// validate the token and extract the user info
+		user, err := getAuthentication(bearer, api.conf.Auth)
+		if err != nil {
+			// We found an Authorization Bearer <token>, but the token could
+			// not be validated, so we return the error and a 400 status
+			msg := fmt.Sprintf("(%T) %s", err, err)
+			http.Error(w, msg, http.StatusBadRequest)
+			return
+		}
+		// We successfully got an Authorization Bearer <token> and validated
+		// the token and have obtained the payload from the token. We will
+		// request a session and add the payload to our session (make sure
+		// we remember to persist the session)
+		sess, _ := api.sessions.MustGet(r)
+		sess.Set("user", user)
+		api.sessions.Save(w, r, sess)
+		// And finally, we will call the next handler in our chain
+		next.ServeHTTP(w, r)
+	}
+	return http.HandlerFunc(fn)
+}
+
+func getAuthentication(bearerToken string, jwtService *jwt.JWTService) (*web.SystemUser, error) {
+	jwtToken := strings.Split(bearerToken, " ")[1]
+	token, err := jwtService.ValidateToken(jwtToken)
+	if err != nil {
+		if e, ok := err.(*jwt.ValidationError); ok {
+			return nil, e
+		}
+		return nil, err
+	}
+	return &web.SystemUser{
+		Username: token.Claims.(jwt.MapClaims)["user"].(string),
+		Password: "",
+		Role:     token.Claims.(jwt.MapClaims)["role"].(string),
+	}, nil
+}
+
+func (api *API) Register(name string, re Resource, secure bool) {
 	h := &handler{
 		name: name,
 		path: filepath.ToSlash(filepath.Join(api.base, name)),
 		reso: re,
 	}
 	api.handlers = append(api.handlers, *h)
-	api.mux.Handle(h.path, middleware.WithLogging(api.logger, h))
+	var hand http.Handler
+	if secure {
+		hand = api.JWTAuthorizationFilter(middleware.WithLogging(api.logger, h))
+	} else {
+		hand = middleware.WithLogging(api.logger, h)
+	}
+	api.mux.Handle(h.path, hand)
 }
 
-func (api *API) RegisterCustom(name string, re CustomResource) {
+func (api *API) RegisterCustom(name string, re CustomResource, secure bool) {
 	h := &customHandler{
 		path: filepath.ToSlash(filepath.Join(api.base, name)),
 		fn:   re.Custom(),
 	}
-	api.mux.Handle(h.path, middleware.WithLogging(api.logger, h))
+	var hand http.Handler
+	if secure {
+		hand = api.JWTAuthorizationFilter(middleware.WithLogging(api.logger, h))
+	} else {
+		hand = middleware.WithLogging(api.logger, h)
+	}
+	api.mux.Handle(h.path, hand)
 }
 
 // func (api *API) _RegisterSecure(name string, re SecureResource) {

@@ -127,7 +127,7 @@ func (p *Parser) ParseUnverified(token string, claims Claims) (*Token, []string,
 	if err != nil {
 		if strings.HasPrefix(strings.ToLower(token), "bearer ") {
 			return jwt, parts, NewValidationError(
-				"tokenstring should not contain 'bearer '",
+				"token string should not contain 'bearer '",
 				ValidationErrorMalformed,
 			)
 		}

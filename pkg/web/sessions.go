@@ -208,6 +208,42 @@ func (ss *SessionStore) Get(r *http.Request) (*Session, bool) {
 	return v.(*Session), true
 }
 
+// MustGet returns a cached session (if one exists), otherwise, it creates and
+// returns a new session. It is guaranteed to return a session.
+func (ss *SessionStore) MustGet(r *http.Request) (*Session, bool) {
+	// First, attempt to get an existing session from the cookie.
+	c := getCookie(r, ss.SessionID)
+	if c == nil {
+		// If no cookie was found, then we must create a new session,
+		// and return false (indicating that we did not find an existing
+		// one, but one had to be created.) Don't forget, this session
+		// WILL NOT be saved unless the Save method is called.
+		return &Session{
+			id:      RandStringN(32), // create session id 32 chars long
+			data:    new(sync.Map),
+			expires: AddTime(time.Now(), ss.Timeout),
+		}, false
+	}
+	// Otherwise, we have found a session, but we must check to ensure
+	// it is not expired and still exists on the server side.
+	v, found := ss.sessions.Load(c.Value)
+	if !found {
+		// If no session was found, then we must create a new session,
+		// and return false (indicating that we did not find an existing
+		// one, but one had to be created.) Don't forget, this session
+		// WILL NOT be saved unless the Save method is called.
+		return &Session{
+			id:      RandStringN(32), // create session id 32 chars long
+			data:    new(sync.Map),
+			expires: AddTime(time.Now(), ss.Timeout),
+		}, false
+	}
+	// Otherwise, we have successfully located an existing session,
+	// so we can simply return it along with a true (indicating that
+	// the session did in fact exist)
+	return v.(*Session), true
+}
+
 // Save persists the provided session. If you would like to remove a session, simply
 // pass it a nil session, and it will time the cookie out.
 func (ss *SessionStore) Save(w http.ResponseWriter, r *http.Request, session *Session) {

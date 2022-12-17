@@ -10,6 +10,7 @@ import (
 // to supply the key for verification. The function receives the parsed but
 // un-verified Token. This allows you to use properties in the Header of the
 // token (like "kid") in order to identify which key to use.
+// *** MAKE SURE YOU RETURN A PUBLIC KEY IN HERE ***
 type KeyFunc func(*Token) (any, error)
 
 // Token represents a JWT. Different fields will be used depending on if you

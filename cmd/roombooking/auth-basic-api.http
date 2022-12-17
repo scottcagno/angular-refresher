@@ -1,0 +1,28 @@
+// Test validation (VALID ONE)
+GET http://localhost:8080/api/auth/basic
+Authorization: Basic YWRtaW46c2VjcmV0 // admin:secret
+
+###
+
+// Test validation (VALID ONE)
+GET http://localhost:8080/api/auth/basic
+Authorization: Basic bWF0dDpzZWNyZXQ= // matt:secret
+
+###
+
+// Test validation (VALID ONE)
+GET http://localhost:8080/api/auth/basic
+Authorization: Basic amFuZTpzZWNyZXQ= // jane:secret
+
+###
+
+// Test validation (INVALID ONE)
+GET http://localhost:8080/api/auth/basic
+Authorization: Basic YWRtaW46c2Vzzzzz
+
+###
+
+// Test validation (NO VALIDATION PROVIDED)
+GET http://localhost:8080/api/auth/basic
+
+###

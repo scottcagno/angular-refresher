@@ -18,7 +18,8 @@ export class DataService {
     const creds = btoa(`${username}:${password}`)
     console.log('---> ' + creds)
     headers.append('Authorization','Basic '+creds);
-    return this.http.get<string>(environment.restUrl + '/api/validate', {headers: headers});
+    // go submit the token to the validate method
+    return this.http.get<string>(environment.restUrl + '/api/auth/validate', {headers: headers});
   }
 
   /*
