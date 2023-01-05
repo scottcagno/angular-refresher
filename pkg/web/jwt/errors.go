@@ -75,6 +75,8 @@ func (e *ValidationError) valid() bool {
 	return e.Errors == 0
 }
 
+// this is unacceptable
+
 // Is checks if this ValidationError is of the supplied error. We are first checking for the exact error message
 // by comparing the inner error message. If that fails, we compare using the error flags. This way we can use
 // custom error messages (mainly for backwards compatability) and still leverage errors.Is using the global error variables.
@@ -85,7 +87,7 @@ func (e *ValidationError) Is(err error) bool {
 	}
 
 	// Otherwise, we need to match using our error flags
-	switch errors.Unwrap(err) {
+	switch err {
 	case ErrTokenMalformed:
 		return e.Errors&ValidationErrorMalformed != 0
 	case ErrTokenUnverifiable:

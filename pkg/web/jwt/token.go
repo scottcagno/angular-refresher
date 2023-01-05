@@ -3,6 +3,7 @@ package jwt
 import (
 	"encoding/base64"
 	"encoding/json"
+	"log"
 	"strings"
 )
 
@@ -81,9 +82,11 @@ func (t *Token) SignedString(key any) (string, error) {
 		return "", err
 	}
 	sig, err := t.Method.Sign(str, key)
+	log.Println("[DEBUG] >>> token.SignedString", str, sig, key, err)
 	if err != nil {
 		return "", err
 	}
+
 	return strings.Join([]string{str, sig}, "."), nil
 }
 

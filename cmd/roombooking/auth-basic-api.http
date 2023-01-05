@@ -1,5 +1,5 @@
-// Test validation (VALID ONE)
-GET http://localhost:8080/api/auth/basic
+// Test registering for a token validation (VALID ONE)
+GET http://localhost:8080/api/auth/register
 Authorization: Basic YWRtaW46c2VjcmV0 // admin:secret
 
 ###

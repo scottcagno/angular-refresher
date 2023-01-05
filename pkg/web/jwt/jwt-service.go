@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
+	"log"
 	"sync"
 	"time"
 )
@@ -55,26 +56,28 @@ func initJWTServiceInstance() *JWTService {
 	}
 }
 
-func (s *JWTService) GenerateToken(username, role string) *Token {
+func (s *JWTService) generateToken(username, password, role string) *Token {
 	return NewTokenWithClaims(
 		s.signingMethod, MapClaims{
 			"user": username,
+			"pass": password,
 			"role": role,
 			"exp":  NewNumericDate(s.expirationTime),
 		},
 	)
 }
 
-func (s *JWTService) GenerateSignedToken(username, role string) string {
-	token := s.GenerateToken(username, role)
+func (s *JWTService) GenerateSignedToken(username, password, role string) string {
+	token := s.generateToken(username, password, role)
 	str, err := token.SignedString(s.publicKey)
 	if err != nil {
+		log.Println("[DEBUG] >>> {jwt-service.go line 74}", token)
 		panic(err)
 	}
 	return str
 }
 
-func (s *JWTService) ValidateToken(tokenString string) (*Token, error) {
+func (s *JWTService) ValidateTokenString(tokenString string) (*Token, error) {
 	parser := NewParser([]string{s.signingMethod.Alg()}, true, false)
 	token, err := parser.Parse(
 		tokenString, func(t *Token) (any, error) {
