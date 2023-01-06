@@ -59,7 +59,10 @@ func main() {
 		Username: "admin",
 		Password: "secret",
 		Role:     "ROLE_ADMIN",
-	}))
+	},
+		"cmd/roombooking/private_key.pem",
+		"cmd/roombooking/public_key.pem",
+	))
 
 	// register controllers with api
 	restAPI.RegisterAuthService("/api/auth", authService)

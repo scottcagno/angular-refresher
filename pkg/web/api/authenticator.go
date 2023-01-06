@@ -1,7 +1,6 @@
 package api
 
 import (
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -35,10 +34,12 @@ func MakeAuthService(authenticator Authenticator) *AuthService {
 }
 
 func (s *AuthService) Secure(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		s.Authenticator.Validate(w, r)
-		next.ServeHTTP(w, r)
-	})
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			s.Authenticator.Validate(w, r)
+			next.ServeHTTP(w, r)
+		},
+	)
 }
 
 type JWTAuthService struct {
@@ -46,9 +47,9 @@ type JWTAuthService struct {
 	users *UserStore
 }
 
-func NewJWTAuthService(defaultUser *web.SystemUser) *JWTAuthService {
+func NewJWTAuthService(defaultUser *web.SystemUser, privateKeyFile, publicKeyFile string) *JWTAuthService {
 	jwtAuthService := &JWTAuthService{
-		jwts:  jwt.NewJWTService(),
+		jwts:  jwt.NewJWTService(privateKeyFile, publicKeyFile),
 		users: NewUserStore(),
 	}
 	if defaultUser != nil {
@@ -77,7 +78,6 @@ func (js *JWTAuthService) Register(w http.ResponseWriter, r *http.Request) {
 	}
 	// Found valid user in store, generate and sign new token
 	tokenString := js.jwts.GenerateSignedToken(user.Username, user.Password, user.Role)
-	log.Println("[DEBUG] >>> ", username, password, hasBasicAuth, tokenString)
 	// Create a new cookie, and add the JWT token string to the cookie
 	chocoChip := &http.Cookie{
 		Name:       "token",
@@ -94,7 +94,7 @@ func (js *JWTAuthService) Register(w http.ResponseWriter, r *http.Request) {
 		Unparsed:   nil,
 	}
 	// Add the cookie to the request
-	r.AddCookie(chocoChip)
+	http.SetCookie(w, chocoChip)
 }
 
 func (js *JWTAuthService) Validate(w http.ResponseWriter, r *http.Request) {
@@ -105,7 +105,7 @@ func (js *JWTAuthService) Validate(w http.ResponseWriter, r *http.Request) {
 	// 	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 	// 	return
 	// }
-	//tokenString := chocoChip.Value
+	// tokenString := chocoChip.Value
 
 	// Check the header for an Authorization Bearer
 	bearer := r.Header.Get("Authorization")

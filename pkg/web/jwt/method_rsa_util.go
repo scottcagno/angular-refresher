@@ -46,15 +46,20 @@ func ReadRSAPrivateKey(file string) (*rsa.PrivateKey, error) {
 	if err != nil {
 		return nil, err
 	}
-	key, err := x509.ParsePKCS8PrivateKey(keyBytes)
+	key, err := x509.ParsePKCS1PrivateKey(keyBytes)
 	if err != nil {
 		return nil, err
 	}
-	rsaKey, ok := key.(*rsa.PrivateKey)
-	if !ok {
-		return nil, errors.New("key type is not RSA")
-	}
-	return rsaKey, nil
+	return key, nil
+	// key, err := x509.ParsePKCS8PrivateKey(keyBytes)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// rsaKey, ok := key.(*rsa.PrivateKey)
+	// if !ok {
+	// 	return nil, errors.New("key type is not RSA")
+	// }
+	// return rsaKey, nil
 }
 
 func ReadRSAPublicKey(file string) (*rsa.PublicKey, error) {
@@ -62,15 +67,29 @@ func ReadRSAPublicKey(file string) (*rsa.PublicKey, error) {
 	if err != nil {
 		return nil, err
 	}
-	key, err := x509.ParsePKIXPublicKey(keyBytes)
+	key, err := x509.ParsePKCS1PublicKey(keyBytes)
 	if err != nil {
 		return nil, err
 	}
-	rsaKey, ok := key.(*rsa.PublicKey)
-	if !ok {
-		return nil, errors.New("key type is not RSA")
+	return key, nil
+	// key, err := x509.ParsePKIXPublicKey(keyBytes)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// rsaKey, ok := key.(*rsa.PublicKey)
+	// if !ok {
+	// 	return nil, errors.New("key type is not RSA")
+	// }
+	// return rsaKey, nil
+}
+
+func RSAPrivateKeyToString(key *rsa.PrivateKey) string {
+	keyBytes := x509.MarshalPKCS1PrivateKey(key)
+	block := &pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: keyBytes,
 	}
-	return rsaKey, nil
+	return string(pem.EncodeToMemory(block))
 }
 
 func WriteRSAPrivateKeyAsPEM(key *rsa.PrivateKey, file string) error {
@@ -91,15 +110,20 @@ func ReadRSAPrivateKeyFromPEM(file string) (*rsa.PrivateKey, error) {
 	if err != nil {
 		return nil, err
 	}
-	key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	key, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
 		return nil, err
 	}
-	rsaKey, ok := key.(*rsa.PrivateKey)
-	if !ok {
-		return nil, errors.New("key type is not RSA")
-	}
-	return rsaKey, nil
+	return key, nil
+	// key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// rsaKey, ok := key.(*rsa.PrivateKey)
+	// if !ok {
+	// 	return nil, errors.New("key type is not RSA")
+	// }
+	// return rsaKey, nil
 }
 
 func ReadPEM(file string) (*pem.Block, error) {
@@ -121,6 +145,15 @@ func WritePEM(block *pem.Block, file string) error {
 		return err
 	}
 	return nil
+}
+
+func RSAPublicKeyToString(key *rsa.PublicKey) string {
+	keyBytes := x509.MarshalPKCS1PublicKey(key)
+	block := &pem.Block{
+		Type:  "RSA PUBLIC KEY",
+		Bytes: keyBytes,
+	}
+	return string(pem.EncodeToMemory(block))
 }
 
 func WriteRSAPublicKeyAsPEM(key *rsa.PublicKey, file string) error {
@@ -153,4 +186,32 @@ func ReadRSAPublicKeyFromPEM(file string) (*rsa.PublicKey, error) {
 		return nil, errors.New("key type is not RSA")
 	}
 	return rsaKey, nil
+}
+
+func RSAPublicKeyFromString(publicKeyString string) (*rsa.PublicKey, error) {
+	block, _ := pem.Decode([]byte(publicKeyString))
+	if block == nil || block.Type != "RSA PUBLIC KEY" {
+		return nil, errors.New("failed to parse PEM block containing keys")
+	}
+	key, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+	rsaKey, ok := key.(*rsa.PublicKey)
+	if !ok {
+		return nil, errors.New("key type is not RSA")
+	}
+	return rsaKey, nil
+}
+
+func RSAPrivateKeyFromString(privateKeyString string) (*rsa.PrivateKey, error) {
+	block, _ := pem.Decode([]byte(privateKeyString))
+	if block == nil || block.Type != "RSA PRIVATE KEY" {
+		return nil, errors.New("failed to parse PEM block containing keys")
+	}
+	key, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+	return key, nil
 }
