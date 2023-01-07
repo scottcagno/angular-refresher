@@ -11,8 +11,8 @@ import {environment} from "../environments/environment";
 })
 export class DataService {
 
-  validateUser(username : string, password : string) :Observable<string> {
-    return of("ok")
+  validateUser(username : string, password : string) :Observable<{ result:string }> {
+    return of({result:"ok"})
   }
 
   private rooms !: Array<Room>;

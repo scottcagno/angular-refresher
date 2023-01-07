@@ -4,6 +4,7 @@ import {Router} from "@angular/router";
 import {DataService} from "../../../data.service";
 import {ConfirmDialogService} from "../../../confirm-dialog/confirm-dialog-service";
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {AuthService} from "../../../auth.service";
 
 @Component({
   selector: 'app-room-detail',
@@ -19,12 +20,17 @@ export class RoomDetailComponent implements OnInit {
   dataChanged = new EventEmitter();
 
   message = '';
+  isAdminUser = false;
 
   constructor(
     private router :Router,
-    private dataService : DataService) { }
+    private dataService : DataService,
+    private authService: AuthService) { }
 
   ngOnInit(): void {
+    if (this.authService.getRole() === 'ROLE_ADMIN') {
+      this.isAdminUser = true;
+    }
   }
 
   editRoom() {

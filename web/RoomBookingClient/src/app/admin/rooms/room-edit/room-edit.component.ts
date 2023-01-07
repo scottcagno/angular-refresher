@@ -5,6 +5,7 @@ import {DataService} from "../../../data.service";
 import {Router} from "@angular/router";
 import {FormResetService} from "../../../form-reset.service";
 import {Subscription} from "rxjs";
+import {AuthService} from "../../../auth.service";
 
 @Component({
   selector: 'app-room-edit',
@@ -31,7 +32,8 @@ export class RoomEditComponent implements OnInit, OnDestroy {
   constructor(private formBuilder: FormBuilder,
               private dataService: DataService,
               private router: Router,
-              private formResetService: FormResetService) {}
+              private formResetService: FormResetService,
+              private authService : AuthService) {}
 
   ngOnInit(): void {
    this.initializeForm();

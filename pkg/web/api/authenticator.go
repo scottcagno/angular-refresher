@@ -1,8 +1,8 @@
 package api
 
 import (
+	"errors"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/scottcagno/angular-refresher/pkg/web"
@@ -99,22 +99,22 @@ func (js *JWTAuthService) Register(w http.ResponseWriter, r *http.Request) {
 
 func (js *JWTAuthService) Validate(w http.ResponseWriter, r *http.Request) {
 	var err error
-	// // Check for a cookie containing our JWT string
-	// chocoChip, err := r.Cookie("token")
-	// if err != nil && errors.Is(err, http.ErrNoCookie) {
-	// 	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-	// 	return
-	// }
-	// tokenString := chocoChip.Value
-
-	// Check the header for an Authorization Bearer
-	bearer := r.Header.Get("Authorization")
-	if bearer == "" || !strings.HasPrefix(bearer, "Bearer") {
-		// We did not find an Authorization Bearer <token>, so we return a 401 status
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+	// Check for a cookie containing our JWT string
+	chocoChip, err := r.Cookie("token")
+	if err != nil && errors.Is(err, http.ErrNoCookie) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
-	tokenString := bearer
+	tokenString := chocoChip.Value
+
+	// // Check the header for an Authorization Bearer
+	// bearer := r.Header.Get("Authorization")
+	// if bearer == "" || !strings.HasPrefix(bearer, "Bearer") {
+	// 	// We did not find an Authorization Bearer <token>, so we return a 401 status
+	// 	http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+	// 	return
+	// }
+	// tokenString := bearer
 
 	// Attempt to validate the token string we found in the cookie
 	_, err = js.jwts.ValidateTokenString(tokenString)

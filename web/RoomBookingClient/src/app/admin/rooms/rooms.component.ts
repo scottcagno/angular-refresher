@@ -3,6 +3,7 @@ import {DataService} from "../../data.service";
 import {Room} from "../../model/Room";
 import {ActivatedRoute, Router} from "@angular/router";
 import {FormResetService} from "../../form-reset.service";
+import {AuthService} from "../../auth.service";
 
 @Component({
   selector: 'app-rooms',
@@ -17,11 +18,13 @@ export class RoomsComponent implements OnInit {
   loadingData = true;
   message = "One moment please... getting the list of rooms."
   maxRetry = 10;
+  isAdminUser = false;
 
   constructor(private dataService :DataService,
               private route :ActivatedRoute,
               private router :Router,
-              private formResetService: FormResetService) {}
+              private formResetService: FormResetService,
+              private authService: AuthService) {}
 
 
   loadData() {
@@ -71,6 +74,9 @@ export class RoomsComponent implements OnInit {
 
     this.loadData();
 
+    if (this.authService.getRole() === 'ROLE_ADMIN') {
+      this.isAdminUser = true;
+    }
 
   }
 

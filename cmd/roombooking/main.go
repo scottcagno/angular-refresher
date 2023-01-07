@@ -42,10 +42,10 @@ func main() {
 
 	apiConf := &api.APIConfig{
 		CORS: &middleware.CORSConfig{
-			AllowOrigins:     "http://localhost:4200/api/**",
+			AllowOrigins:     "http://localhost:4200",
 			AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
-			AllowHeaders:     "",
-			AllowCredentials: false,
+			AllowHeaders:     "Content-Type",
+			AllowCredentials: true,
 			ExposeHeaders:    "",
 			MaxAge:           int(time.Duration(12 * time.Hour).Seconds()),
 		},
@@ -55,14 +55,17 @@ func main() {
 	restAPI := api.NewAPI("/api/", apiConf)
 
 	// initialize auth service
-	authService := api.MakeAuthService(api.NewJWTAuthService(&web.SystemUser{
-		Username: "admin",
-		Password: "secret",
-		Role:     "ROLE_ADMIN",
-	},
-		"cmd/roombooking/private_key.pem",
-		"cmd/roombooking/public_key.pem",
-	))
+	authService := api.MakeAuthService(
+		api.NewJWTAuthService(
+			&web.SystemUser{
+				Username: "admin",
+				Password: "secret",
+				Role:     "ROLE_ADMIN",
+			},
+			"cmd/roombooking/private_key.pem",
+			"cmd/roombooking/public_key.pem",
+		),
+	)
 
 	// register controllers with api
 	restAPI.RegisterAuthService("/api/auth", authService)

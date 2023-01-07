@@ -12,21 +12,21 @@ import {HttpClient, HttpHeaders} from "@angular/common/http";
 })
 export class DataService {
 
-  validateUser(username : string, password : string) :Observable<string> {
+  validateUser(username : string, password : string) :Observable<{result:string}> {
     const headers = new HttpHeaders();
     console.log('got creds: ' + username + ', ' + password );
     const creds = btoa(`${username}:${password}`)
     console.log('---> ' + creds)
     headers.append('Authorization','Basic '+creds);
     // go submit the token to the validate method
-    return this.http.get<string>(environment.restUrl + '/api/auth/validate', {headers: headers});
+    return this.http.get<{result:string}>(environment.restUrl + '/api/auth/register', {headers: headers, withCredentials:true});
   }
 
   /*
    * Room methods
    */
   getRooms() :Observable<Array<Room>> {
-    return this.http.get<Array<Room>>(Room.endpoint()).pipe(
+    return this.http.get<Array<Room>>(Room.endpoint(), {withCredentials:true}).pipe(
       map(
         data => {
           const rooms = new Array<Room>();
@@ -44,7 +44,7 @@ export class DataService {
   }
 
   updateRoom(room: Room): Observable<Room> {
-    return this.http.put<Room>(Room.endpoint(room.id), room);
+    return this.http.put<Room>(Room.endpoint(room.id), room, {withCredentials:true});
   }
 
   deleteRoom(id: number) : Observable<any> {

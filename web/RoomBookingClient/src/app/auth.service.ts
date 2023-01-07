@@ -27,4 +27,17 @@ export class AuthService {
   logout() {
     this.isAuthenticated = false;
   }
+
+  getRole() :string {
+    // if (this.jwtToken == null) {
+    //   return ''
+    // }
+    // // grab the middle, aka payload
+    // const encodedPayload = this.jwtToken.split('.')[1];
+    // // base64 decode the payload
+    // const payload = atob(encodedPayload);
+    // // payload is a json string
+    // return JSON.parse(payload).role;
+    return 'ROLE_ADMIN'; // temp fix
+  }
 }

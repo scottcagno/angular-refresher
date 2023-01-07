@@ -1,6 +1,6 @@
 <h2>Rooms Admin</h2>
 <div class="pb-2">
-  <button class="btn btn-sm btn-outline-success" type="button" (click)="addRoom()">
+  <button class="btn btn-sm btn-outline-success" type="button" (click)="addRoom()" *ngIf="isAdminUser">
     <i class="fa fa-plus"> </i> Add Room
   </button>
 </div>

@@ -66,24 +66,24 @@ func CORSHandler(c *CORSConfig) http.Handler {
 		c = defaultCORSConfig
 		goto skipSetDefaults
 	}
-	if c.AllowOrigins != "" {
-		c.AllowOrigins = defaultCORSConfig.AllowOrigins
-	}
-	if c.AllowMethods != "" {
-		c.AllowMethods = defaultCORSConfig.AllowMethods
-	}
-	if c.AllowHeaders != "" {
-		c.AllowHeaders = defaultCORSConfig.AllowHeaders
-	}
-	if !c.AllowCredentials {
-		c.AllowCredentials = defaultCORSConfig.AllowCredentials
-	}
-	if c.ExposeHeaders != "" {
-		c.ExposeHeaders = defaultCORSConfig.ExposeHeaders
-	}
-	if c.MaxAge == 0 {
-		c.ExposeHeaders = defaultCORSConfig.ExposeHeaders
-	}
+	// if c.AllowOrigins == "" {
+	// 	c.AllowOrigins = defaultCORSConfig.AllowOrigins
+	// }
+	// if c.AllowMethods == "" {
+	// 	c.AllowMethods = defaultCORSConfig.AllowMethods
+	// }
+	// if c.AllowHeaders == "" {
+	// 	c.AllowHeaders = defaultCORSConfig.AllowHeaders
+	// }
+	// if !c.AllowCredentials {
+	// 	c.AllowCredentials = defaultCORSConfig.AllowCredentials
+	// }
+	// if c.ExposeHeaders != "" {
+	// 	c.ExposeHeaders = defaultCORSConfig.ExposeHeaders
+	// }
+	// if c.MaxAge == 0 {
+	// 	c.ExposeHeaders = defaultCORSConfig.ExposeHeaders
+	// }
 skipSetDefaults:
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
