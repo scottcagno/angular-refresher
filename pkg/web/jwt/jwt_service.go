@@ -135,3 +135,7 @@ func (s *JWTService) ValidateTokenString(tokenString string) (*Token, error) {
 	}
 	return token, nil
 }
+
+func (s *JWTService) ExpireTime() time.Time {
+	return s.expirationTime
+}

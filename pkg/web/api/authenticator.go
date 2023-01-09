@@ -86,8 +86,8 @@ func (js *JWTAuthService) Register(w http.ResponseWriter, r *http.Request) {
 		Domain:     "",
 		Expires:    time.Time{},
 		RawExpires: "",
-		MaxAge:     0,
-		Secure:     false,
+		MaxAge:     js.jwts.ExpireTime().Second(),
+		Secure:     true, // set true, when in production
 		HttpOnly:   true,
 		SameSite:   0,
 		Raw:        "",
@@ -129,4 +129,43 @@ func (js *JWTAuthService) Validate(w http.ResponseWriter, r *http.Request) {
 	// If we get here, then our token was valid, return 200 OK
 	w.WriteHeader(http.StatusOK)
 	return
+}
+
+func VerifyJWT(service *jwt.JWTService, next http.HandlerFunc) http.HandlerFunc {
+	const errCode = http.StatusUnauthorized
+	return func(w http.ResponseWriter, r *http.Request) {
+		//
+		// Check for a cookie containing a JWT token
+		//
+		cook, err := r.Cookie("token")
+		if err != nil && errors.Is(err, http.ErrNoCookie) {
+			// No cookie found, return status unauthorized
+			http.Error(w, http.StatusText(errCode), errCode)
+			return
+		}
+		tokenString := cook.Value
+		// //
+		// // Check the header for an Authorization Bearer
+		// //
+		// bearer := r.Header.Get("Authorization")
+		// if bearer == "" || !strings.HasPrefix(bearer, "Bearer") {
+		// 	// No Bearer token found, return status unauthorized
+		// 	http.Error(w, http.StatusText(errCode), errCode)
+		// 	return
+		// }
+		// tokenString := bearer
+
+		//
+		// Attempt to validate the token string
+		//
+		_, err = service.ValidateTokenString(tokenString)
+		if err != nil {
+			if _, is := err.(*jwt.ValidationError); is {
+				http.Error(w, http.StatusText(errCode), errCode)
+				return
+			}
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+	}
 }
