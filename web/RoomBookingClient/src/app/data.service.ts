@@ -67,6 +67,12 @@ export class DataService {
    );
   }
 
+  getRole() :Observable<{ role: string }>{
+    const o = this.http.get<{role:string}>(User.getRoleURL(), {withCredentials:true})
+    console.log(JSON.stringify(o))
+    return o
+  }
+
   getUser(id: number) :Observable<User> {
     return this.http.get<User>(User.endpoint(id))
       .pipe(

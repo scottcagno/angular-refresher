@@ -1,15 +1,19 @@
 package users
 
 import (
+	"errors"
+	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/scottcagno/angular-refresher/pkg/web/api"
+	"github.com/scottcagno/angular-refresher/pkg/web/jwt"
 )
 
 type Controller struct {
 	*UserRepository
-	//BasicAuth *services.JWTService
+	Auth *api.JWTAuthService
 }
 
 // func (c *Controller) CheckAuth(user, pass string) http.HandlerFunc {
@@ -122,29 +126,63 @@ func (c *Controller) Del(w http.ResponseWriter, r *http.Request) {
 
 func (c *Controller) Custom() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id, found := api.GetParam(r, "id")
-		if !found {
-			api.WriteJSON(w, http.StatusExpectationFailed, "required an ID")
+
+		switch {
+		case strings.HasSuffix(r.URL.Path, "users/resetPassword"):
+			id, found := api.GetParam(r, "id")
+			if !found {
+				api.WriteJSON(w, http.StatusExpectationFailed, "required an ID")
+				return
+			}
+			// handle get one
+			uid, err := strconv.Atoi(id)
+			if err != nil {
+				api.WriteJSON(w, http.StatusExpectationFailed, err)
+				return
+			}
+			user, err := c.Find(func(u *User) bool { return u.ID == uid })
+			if err != nil || len(user) != 1 {
+				api.WriteJSON(w, http.StatusExpectationFailed, err)
+				return
+			}
+			user[0].Password = "reset"
+			err = c.Update(user[0].ID, user[0])
+			if err != nil {
+				api.WriteJSON(w, http.StatusExpectationFailed, err)
+				return
+			}
+			api.WriteJSON(w, http.StatusOK, user)
 			return
-		}
-		// handle get one
-		uid, err := strconv.Atoi(id)
-		if err != nil {
-			api.WriteJSON(w, http.StatusExpectationFailed, err)
+		case strings.HasSuffix(r.URL.Path, "users/getRole"):
+			// Check for a cookie containing our JWT string
+			cook, err := r.Cookie("token")
+			if err != nil && errors.Is(err, http.ErrNoCookie) {
+				api.WriteJSON(w, http.StatusNotFound, map[string]any{"err": "no cookie was found"})
+				return
+			}
+			// Attempt to validate the token string we found in the cookie
+			tok, err := c.Auth.Service.ValidateTokenString(cook.Value)
+			log.Println(err, tok)
+			if err != nil {
+				if _, is := err.(*jwt.ValidationError); is {
+					api.WriteJSON(w, http.StatusUnauthorized, err)
+					return
+				}
+				api.WriteJSON(w, http.StatusNotFound, map[string]any{"err": "validation failed"})
+				return
+			}
+			// Check for the role in the claims payload
+			payload, ok := tok.Claims.(jwt.MapClaims)
+			if !ok {
+				api.WriteJSON(w, http.StatusNotFound, map[string]any{"err": "could not extract claims"})
+				return
+			}
+			api.WriteJSON(w, http.StatusOK, map[string]any{"role": payload["role"]})
 			return
+		case strings.HasSuffix(r.URL.Path, "users/list"):
+			// Get all the users from the users store
+			allUsers := c.Auth.Users.AllUsers()
+			api.WriteJSON(w, http.StatusOK, map[string]any{"users": allUsers})
 		}
-		user, err := c.Find(func(u *User) bool { return u.ID == uid })
-		if err != nil || len(user) != 1 {
-			api.WriteJSON(w, http.StatusExpectationFailed, err)
-			return
-		}
-		user[0].Password = "reset"
-		err = c.Update(user[0].ID, user[0])
-		if err != nil {
-			api.WriteJSON(w, http.StatusExpectationFailed, err)
-			return
-		}
-		api.WriteJSON(w, http.StatusOK, user)
-		return
 	}
 }

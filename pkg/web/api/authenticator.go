@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"time"
 
@@ -43,17 +44,19 @@ func (s *AuthService) Secure(next http.Handler) http.Handler {
 }
 
 type JWTAuthService struct {
-	jwts  *jwt.JWTService
-	users *UserStore
+	Service *jwt.JWTService
+	Users   *UserStore
 }
 
-func NewJWTAuthService(defaultUser *web.SystemUser, privateKeyFile, publicKeyFile string) *JWTAuthService {
+func NewJWTAuthService(privateKeyFile, publicKeyFile string, defaultUsers ...*web.SystemUser) *JWTAuthService {
 	jwtAuthService := &JWTAuthService{
-		jwts:  jwt.NewJWTService(privateKeyFile, publicKeyFile),
-		users: NewUserStore(),
+		Service: jwt.NewJWTService(privateKeyFile, publicKeyFile),
+		Users:   NewUserStore(),
 	}
-	if defaultUser != nil {
-		jwtAuthService.users.AddUser(defaultUser.Username, defaultUser.Password, defaultUser.Role)
+	if defaultUsers != nil {
+		for _, user := range defaultUsers {
+			jwtAuthService.Users.AddUser(user.Username, user.Password, user.Role)
+		}
 	}
 	return jwtAuthService
 }
@@ -61,6 +64,7 @@ func NewJWTAuthService(defaultUser *web.SystemUser, privateKeyFile, publicKeyFil
 func (js *JWTAuthService) Register(w http.ResponseWriter, r *http.Request) {
 	// Check for HTTP basic authentication
 	username, password, hasBasicAuth := r.BasicAuth()
+	log.Println(username, password, hasBasicAuth)
 	if !hasBasicAuth {
 		w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
@@ -68,7 +72,7 @@ func (js *JWTAuthService) Register(w http.ResponseWriter, r *http.Request) {
 	}
 	var user *web.SystemUser
 	// Received valid HTTP basic authentication token; check store
-	user = js.users.GetUser(username)
+	user = js.Users.GetUser(username)
 	if user == nil {
 		// User was not found, we must fill out a new one based on the provided
 		// basic authentication we received.
@@ -77,16 +81,16 @@ func (js *JWTAuthService) Register(w http.ResponseWriter, r *http.Request) {
 		user.Role = "ROLE_USER"
 	}
 	// Found valid user in store, generate and sign new token
-	tokenString := js.jwts.GenerateSignedToken(user.Username, user.Password, user.Role)
+	tokenString := js.Service.GenerateSignedToken(user.Username, user.Password, user.Role)
 	// Create a new cookie, and add the JWT token string to the cookie
 	chocoChip := &http.Cookie{
 		Name:       "token",
 		Value:      tokenString,
-		Path:       "",
+		Path:       "/",
 		Domain:     "",
 		Expires:    time.Time{},
 		RawExpires: "",
-		MaxAge:     js.jwts.ExpireTime().Second(),
+		MaxAge:     js.Service.ExpireTime().Second(),
 		Secure:     true, // set true, when in production
 		HttpOnly:   true,
 		SameSite:   0,
@@ -117,7 +121,7 @@ func (js *JWTAuthService) Validate(w http.ResponseWriter, r *http.Request) {
 	// tokenString := bearer
 
 	// Attempt to validate the token string we found in the cookie
-	_, err = js.jwts.ValidateTokenString(tokenString)
+	_, err = js.Service.ValidateTokenString(tokenString)
 	if err != nil {
 		if _, is := err.(*jwt.ValidationError); is {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)

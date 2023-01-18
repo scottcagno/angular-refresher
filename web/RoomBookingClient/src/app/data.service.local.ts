@@ -49,6 +49,11 @@ export class DataService {
     return of(null);
   }
 
+  getRole() :Observable<{ role: string }>{
+    console.log("THE data.service.local.ts IS CURRENTLY BEING USED")
+    return of({role:"ROLE_ADMIN"})
+  }
+
   getUsers() :Observable<Array<User>> {
     return of(this.users);
   }

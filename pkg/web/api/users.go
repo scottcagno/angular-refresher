@@ -46,3 +46,20 @@ func (us *UserStore) DeleteUser(username string) {
 		log.Printf("[UserStore] user could not be found: %s\n", err)
 	}
 }
+
+func (us *UserStore) AllUsers() []web.SystemUser {
+	var allUsers []web.SystemUser
+	appendUser := func(k, v any) bool {
+		user, ok := v.(web.SystemUser)
+		if !ok {
+			return false
+		}
+		allUsers = append(allUsers, user)
+		return true
+	}
+	us.store.store.Range(appendUser)
+	if len(allUsers) == 0 {
+		return nil
+	}
+	return allUsers
+}

@@ -74,7 +74,7 @@ export class RoomsComponent implements OnInit {
 
     this.loadData();
 
-    if (this.authService.getRole() === 'ROLE_ADMIN') {
+    if (this.authService.role === 'ROLE_ADMIN') {
       this.isAdminUser = true;
     }
 

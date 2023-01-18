@@ -16,6 +16,27 @@ import (
 
 func main() {
 
+	// create a couple in memory users
+	inMemoryDefaultUsers := []*web.SystemUser{
+		{
+			Username: "admin",
+			Password: "secret",
+			Role:     "ROLE_ADMIN",
+		},
+		{
+			Username: "user",
+			Password: "secret",
+			Role:     "ROLE_USER",
+		},
+	}
+
+	// initialize jwtService
+	jwtService := api.NewJWTAuthService(
+		"cmd/roombooking/private_key.pem",
+		"cmd/roombooking/public_key.pem",
+		inMemoryDefaultUsers...,
+	)
+
 	// initialize global data service (contains ref to all repositories)
 	ds := services.NewDataService()
 
@@ -23,7 +44,7 @@ func main() {
 	roomCont := &rooms.Controller{RoomRepository: ds.RoomRepo}
 
 	// initialize users controller
-	userCont := &users.Controller{UserRepository: ds.UserRepo}
+	userCont := &users.Controller{UserRepository: ds.UserRepo, Auth: jwtService}
 
 	// initialize booking controller
 	bookingCont := &booking.Controller{BookingRepository: ds.BookingRepo}
@@ -55,17 +76,7 @@ func main() {
 	restAPI := api.NewAPI("/api/", apiConf)
 
 	// initialize auth service
-	authService := api.MakeAuthService(
-		api.NewJWTAuthService(
-			&web.SystemUser{
-				Username: "admin",
-				Password: "secret",
-				Role:     "ROLE_ADMIN",
-			},
-			"cmd/roombooking/private_key.pem",
-			"cmd/roombooking/public_key.pem",
-		),
-	)
+	authService := api.MakeAuthService(jwtService)
 
 	// register controllers with api
 	restAPI.RegisterAuthService("/api/auth", authService)
@@ -73,6 +84,8 @@ func main() {
 	restAPI.Register("users", userCont, true)
 	restAPI.Register("bookings", bookingCont, false)
 	restAPI.RegisterCustom("users/resetPassword", userCont, true)
+	restAPI.RegisterCustom("users/getRole", userCont, false)
+	restAPI.RegisterCustom("users/list", userCont, false)
 
 	// certFile := "cmd/roombooking/cert/CA/CA.pem"
 	// keyFile := "cmd/roombooking/cert/CA/CA.key"
